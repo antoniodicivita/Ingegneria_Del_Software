@@ -22,7 +22,7 @@ import java.net.UnknownHostException;
 /**
  * Created by Chriz 7X on 16/11/2015.
  */
-public class UtenteGUI extends JFrame implements ActionListener {
+public class BadgeGUI extends JFrame implements ActionListener {
 
     boolean state_TrueFalse;
     int Return_ID_User;
@@ -62,7 +62,7 @@ public class UtenteGUI extends JFrame implements ActionListener {
 
 
 
-    public UtenteGUI() throws UnknownHostException, IOException{
+    public BadgeGUI() throws UnknownHostException, IOException{
         TextBoxBADGE_IN=new JTextField();
         LabelBADGE_IN=new JLabel();
         ButtonBADGE_IN=new JButton();
@@ -223,7 +223,7 @@ public class UtenteGUI extends JFrame implements ActionListener {
 
     public static void main(String[] args) throws UnknownHostException,
             IOException {
-        UtenteGUI user=new UtenteGUI();
+        BadgeGUI user=new BadgeGUI();
         FxTableUser.main(args);
         user.setVisible(true);
 //Orologio.main(args);
