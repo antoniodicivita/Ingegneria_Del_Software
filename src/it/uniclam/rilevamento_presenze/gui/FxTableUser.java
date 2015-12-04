@@ -6,7 +6,7 @@ import it.uniclam.rilevamento_presenze.connections.ConnectionDB;
 //import it.uniclam.rilevamento_presenze.test.test.User;
 
 import it.uniclam.rilevamento_presenze.connections.Server;
-import it.uniclam.rilevamento_presenze.Dipendente;
+import it.uniclam.rilevamento_presenze.beanclass.Dipendente;
 import it.uniclam.rilevamento_presenze.jdbcdao.DipendenteJDBCDAO;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;

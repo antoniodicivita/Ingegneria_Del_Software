@@ -10,10 +10,6 @@ public class Time {
 
 
     String months[] =null;
-   /* String months[] = {
-            "Jan", "Feb", "Mar", "Apr",
-            "May", "Jun", "Jul", "Aug",
-            "Sep", "Oct", "Nov", "Dec"};*/
 
     private String hour = "";
     private String date = "";
