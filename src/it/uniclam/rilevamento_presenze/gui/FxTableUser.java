@@ -1,9 +1,7 @@
 package it.uniclam.rilevamento_presenze.gui;
 
 import it.uniclam.rilevamento_presenze.connections.ConnectionDB;
-//import it.uniclam.rilevamento_presenze.JDBCDataAccessObject.UserJDBCDAO;
 
-//import it.uniclam.rilevamento_presenze.test.test.User;
 
 import it.uniclam.rilevamento_presenze.connections.Server;
 import it.uniclam.rilevamento_presenze.beanclass.Dipendente;
@@ -34,7 +32,6 @@ import javafx.stage.Stage;
 
 import java.sql.*;
 
-//import it.uniclam.rilevamento_presenze.JDBCDataAccessObject.DynamicJDBCDAO;
 
 public class FxTableUser
 		extends Application {
@@ -359,53 +356,6 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
 /*************************/
         }//Fine Handle()
     }//Fine search listner button
-
-
-
-  /*  private ObservableList<User> RefreshData() {
-
-        List<User> list = new ArrayList<>();
-        /*
-        try {
-            String queryString = "SELECT * FROM libri";
-            connection = getConnection();
-
-            Statement st = connection.createStatement();
-            ResultSet res = st.executeQuery(queryString);
-            System.out.println("Prepare sctatement OK");
-            while (res.next()) {
-
-                String title = res.getString("title");
-                String author = res.getString("author");
-
-                list.add(new User(title, author));
-
-                System.out.println(title + "\t" + author +" Refresh dei dati");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (resultSet != null)
-                    resultSet.close();
-                if (ptmt != null)
-                    ptmt.close();
-                if (connection != null)
-                    connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
-        ObservableList<User> data = FXCollections.observableList(list);
- return data;
-    }*/
-
-
-
-
 
 
 }

@@ -366,6 +366,76 @@ public class DipendenteJDBCDAO {
         return state;
     }
 
+    public String genPDF(String type_query){
+
+        String req = type_query +"\n";
+
+
+        try {
+            Socket s = new Socket(Server.HOST, Server.PORT);
+
+            PrintWriter out =new PrintWriter(s.getOutputStream(),true);
+            BufferedReader in= new BufferedReader(new InputStreamReader(s.getInputStream()));
+            out.println(req);
+            String line=in.readLine();
+
+            System.out.println(line);
+            s.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+return req;
+
+    }
+
+
+    public String SELECT_PDF() {
+
+        int state=0;
+        String stringa="";
+        try {
+            String queryString = "SELECT * FROM user  ";
+            connection = getConnection();
+            System.out.println("CO");
+            Statement st = connection.createStatement();
+            ResultSet res = st.executeQuery(queryString);
+          /* if (res.next()!=false){
+                System.out.println("ACCESSO VALIDO");
+*/
+            while (res.next()==true) {
+                int id=res.getInt("ID_User");
+                String nome = res.getString("Nome");
+                String cognome = res.getString("Cognome");
+
+stringa=id + "\t" + nome + "\t" + cognome;
+                System.out.println(id + "\t" + nome + "\t" + cognome);
+                state=id;}
+            //if(res.next()==false) { System.out.println("ACCESSO NEGATO:Badge non valido");}
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+
+                if (resultSet != null)
+                    resultSet.close();
+                if (ptmt != null)
+                    ptmt.close();
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+        return stringa;
+
+
+}
+
 
 
 }

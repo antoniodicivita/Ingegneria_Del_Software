@@ -2,6 +2,7 @@
   <library name="mysql-connector-java-5.1.37-bin">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/mysql-connector-java-5.1.37-bin.jar!/" />
+      <root url="jar://$PROJECT_DIR$/itextpdf-5.2.1.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
