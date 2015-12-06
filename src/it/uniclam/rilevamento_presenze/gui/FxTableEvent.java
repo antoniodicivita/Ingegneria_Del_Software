@@ -1,25 +1,21 @@
 package it.uniclam.rilevamento_presenze.gui;
 
+import it.uniclam.rilevamento_presenze.beanclass.Event;
 import it.uniclam.rilevamento_presenze.connections.ConnectionDB;
-
-
 import it.uniclam.rilevamento_presenze.connections.Server;
-import it.uniclam.rilevamento_presenze.beanclass.Dipendente;
-import it.uniclam.rilevamento_presenze.jdbcdao.DipendenteJDBCDAO;
+import it.uniclam.rilevamento_presenze.jdbcdao.EventJDBCDAO;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.*;
 import javafx.scene.control.TableColumn.CellEditEvent;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
@@ -31,9 +27,11 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class FxTableUser
+public class FxTableEvent
 		extends Application {
 
     /*CONNE DB*/
@@ -54,9 +52,9 @@ public class FxTableUser
     }
     /*FINE Conn DB*/
 
-    public FxTableUser(){}
-    private TableView<Dipendente> table;
-	private ObservableList<Dipendente> data;
+    public FxTableEvent(){}
+    private TableView<Event> table;
+	private ObservableList<Event> data;
 	private Text actionStatus;
 
 	public static void main(String [] args) {
@@ -86,49 +84,49 @@ public class FxTableUser
 		table.setItems(data);
 		table.setEditable(true);
 //Vedere QUI
-		TableColumn titleCol = new TableColumn("Cognome");
-		titleCol.setCellValueFactory(new PropertyValueFactory<Dipendente, String>("Cognome"));
-		titleCol.setCellFactory(TextFieldTableCell.forTableColumn());
-		titleCol.setOnEditCommit(new EventHandler<CellEditEvent<Dipendente, String>>() {
+		TableColumn hourCol = new TableColumn("Hour");
+		hourCol.setCellValueFactory(new PropertyValueFactory<Event, String>("Hour"));
+		hourCol.setCellFactory(TextFieldTableCell.forTableColumn());
+		hourCol.setOnEditCommit(new EventHandler<CellEditEvent<Event, String>>() {
 			@Override
-			public void handle(CellEditEvent<Dipendente, String> t) {
+			public void handle(CellEditEvent<Event, String> t) {
 
-				((Dipendente) t.getTableView().getItems().get(
+				((Event) t.getTableView().getItems().get(
 					t.getTablePosition().getRow())
-				).setCognome(t.getNewValue());
+				).setHour(t.getNewValue());
 			}
 		});
 
-		final TableColumn authorCol = new TableColumn("Nome");
-		authorCol.setCellValueFactory(new PropertyValueFactory<Dipendente, String>("Nome"));
-		authorCol.setCellFactory(TextFieldTableCell.forTableColumn());
-		authorCol.setOnEditCommit(new EventHandler<CellEditEvent<Dipendente, String>>() {
+		final TableColumn dataCol = new TableColumn("Data");
+		dataCol.setCellValueFactory(new PropertyValueFactory<Event, String>("Data"));
+		dataCol.setCellFactory(TextFieldTableCell.forTableColumn());
+		dataCol.setOnEditCommit(new EventHandler<CellEditEvent<Event, String>>() {
 			@Override
-			public void handle(CellEditEvent<Dipendente, String> t) {
-	DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
-            ((Dipendente) t.getTableView().getItems().get(
+			public void handle(CellEditEvent<Event, String> t) {
+	EventJDBCDAO lj=new EventJDBCDAO();
+            ((Event) t.getTableView().getItems().get(
                             t.getTablePosition().getRow())
-            ).setNome(t.getNewValue());
+            ).setData(t.getNewValue());
 
                 //Aggiorno il valore nel database INIZIO:
                 int ix = table.getSelectionModel().getSelectedIndex();
-                Dipendente dipendente = (Dipendente) table.getSelectionModel().getSelectedItem();
+                Event dipendente = (Event) table.getSelectionModel().getSelectedItem();
                 System.out.println(ix);
 
 
 
-                String nome=table.getItems().get(ix).getNome().toString();
-                String cognome=table.getItems().get(ix).getCognome().toString();
+                String nome=table.getItems().get(ix).getHour().toString();
+                String cognome=table.getItems().get(ix).getData().toString();
                // System.out.println(autore+"tralalal");
                 //update
-                lj.updateList(Server.QUERY_UPDATE_LIST, nome, cognome);
+                //QUERYlj.updateList(Server.QUERY_UPDATE_LIST, nome, cognome);
                 //Aggiorno il valore nel database FINE:
 
                 System.out.println("Ho modificato il valore di autori");
 			}
 		});
 
-		table.getColumns().setAll(titleCol, authorCol);
+		table.getColumns().setAll(hourCol, dataCol);
 		table.setPrefWidth(450);
 		table.setPrefHeight(300);
 		table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -188,7 +186,7 @@ public class FxTableUser
 
 		// Select the first row
 		table.getSelectionModel().select(0);
-		Dipendente dipendente = table.getSelectionModel().getSelectedItem();
+		Event dipendente = table.getSelectionModel().getSelectedItem();
 		actionStatus.setText(dipendente.toString());
 		
 	} // start()
@@ -206,7 +204,7 @@ public class FxTableUser
 				return; // invalid data
 			}
 
-			Dipendente dipendente = data.get(ix);
+			Event dipendente = data.get(ix);
 
 
            actionStatus.setText(dipendente.toString());
@@ -216,15 +214,55 @@ public class FxTableUser
 	}
 
 	//(SELECT)Lettura di tutti i dipendenti dalla tabellaOK
-	private ObservableList<Dipendente> getInitialTableData() {
-        DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
+	private ObservableList<Event> getInitialTableData() {
+        Connection connection = null;
+        PreparedStatement ptmt= null;
+        ResultSet resultSet = null;
+        EventJDBCDAO lj=new EventJDBCDAO();
+        List list = new ArrayList();
 
         System.out.println("Sono passato da fuori");
 
-        return lj.SELECT_List(Server.QUERY_SELECT_ALL_LIST);
-	}
+        try {
+            String queryString = "SELECT * FROM event  ";
+            connection = getConnection();
+
+            Statement st = connection.createStatement();
+            ResultSet res = st.executeQuery(queryString);
+
+            while (res.next()==true) {
+
+String ora=res.getString("Hour");
+                String data= res.getString("Data");
+                list.add(new Event(ora, data));
+
+            }
+            //if(res.next()==false) { System.out.println("ACCESSO NEGATO:Badge non valido");}
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+
+                if (resultSet != null)
+                    resultSet.close();
+                if (ptmt != null)
+                    ptmt.close();
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+        ObservableList data = FXCollections.observableList(list);
+
+        return data;
+    }
 	
-//Aggiunta di un Dipendente alla tabella OK
+//Aggiunta di un Event alla tabella OK
     private class AddButtonListener implements EventHandler<ActionEvent> {
         //DynamicJDBCDAO dJD=new DynamicJDBCDAO();
 		@Override
@@ -244,8 +282,8 @@ public class FxTableUser
         @Override
         public void handle(ActionEvent e) {
 
-            DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
-            Dipendente dipendente = dipendente =new Dipendente("",TextboxInsertPK.getText());
+            EventJDBCDAO lj=new EventJDBCDAO();
+            Event dipendente = dipendente =new Event("",TextboxInsertPK.getText());
             data.add(dipendente);
 
             int row = data.size() - 1;
@@ -256,7 +294,7 @@ public class FxTableUser
             table.getFocusModel().focus(row);
             lj.addList(Server.QUERY_ADD_LIST,TextboxInsertPK.getText());
 
-            //actionStatus.setText("Nuovo Dipendente: Inserisci nome e cognome. Prmere <Enter>.");
+            //actionStatus.setText("Nuovo Event: Inserisci nome e cognome. Prmere <Enter>.");
             buttonHbTWO.setVisible(false);
             buttonHb.setVisible(true);
             TextboxInsertPK.setVisible(false);
@@ -268,21 +306,21 @@ public class FxTableUser
 
     //(DELETE)Cancellazione elementi dalla tabella e dal DB
 	private class DeleteButtonListener implements EventHandler<ActionEvent> {
-DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
+EventJDBCDAO lj=new EventJDBCDAO();
 		@Override
 		public void handle(ActionEvent e) {
 
 			// Get selected row and delete
 			int ix = table.getSelectionModel().getSelectedIndex();
-			Dipendente dipendente = (Dipendente) table.getSelectionModel().getSelectedItem();
+			Event dipendente = (Event) table.getSelectionModel().getSelectedItem();
             System.out.println(table.getItems().get(ix).toString());
 
             //System.out.println(table.getItems().get(ix).getTitle().toString());//Titolo X selezionato OK
             //System.out.println(table.getItems().get(ix).getAuthor().toString());//Autore X selezionato OK
-            String titolo=table.getItems().get(ix).getNome().toString();
-            String autore=table.getItems().get(ix).getCognome().toString();
+            String titolo=table.getItems().get(ix).getHour().toString();
+            String autore=table.getItems().get(ix).getData().toString();
             data.remove(ix);//Elimino l'elemento dalla tabella e la aggiorno
-            lj.removeList(Server.QUERY_REMOVE_LIST,titolo,autore);
+           // lj.removeList(Server.QUERY_REMOVE_LIST,titolo,autore);
             actionStatus.setText("Cancellato: " + dipendente.toString());
 
 			// Select a row
@@ -307,7 +345,7 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
     //(SEARCH)Cancellazione elementi dalla tabella e dal DB OK
     private class SearchButtonListener implements EventHandler<ActionEvent> {
 
-        DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
+        EventJDBCDAO lj=new EventJDBCDAO();
         @Override
         public void handle(ActionEvent e) {
 
@@ -317,7 +355,7 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
             table.getItems().clear();
             String value=TextboxSearch.getText();
 
-            lj.searchList(Server.QUERY_SEARCH_LIST,value,data);
+          //  lj.searchList(Server.QUERY_SEARCH_LIST,value,data);
 
 
 
@@ -326,25 +364,25 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
     }//Fine search listner button
 
     private class DetailshButtonListener implements EventHandler<ActionEvent> {
-DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
+EventJDBCDAO lj=new EventJDBCDAO();
         @Override
         public void handle(ActionEvent e) {
 
 
 // Get selected row and delete
             int ix = table.getSelectionModel().getSelectedIndex();
-            Dipendente dipendente = (Dipendente) table.getSelectionModel().getSelectedItem();
+            Event dipendente = (Event) table.getSelectionModel().getSelectedItem();
             System.out.println(table.getItems().get(ix).toString());
 
             //System.out.println(table.getItems().get(ix).getTitle().toString());//Titolo X selezionato OK
             //System.out.println(table.getItems().get(ix).getAuthor().toString());//Autore X selezionato OK
-            String nome=table.getItems().get(ix).getNome().toString();
+         /*   String nome=table.getItems().get(ix).getNome().toString();
             String cognome=table.getItems().get(ix).getCognome().toString();
+*/
+         //  lj.MySQL_GridView(Server.QUERY_ORDERDATE,nome, cognome);
 
-           lj.MySQL_GridView(Server.QUERY_ORDERDATE,nome, cognome);
 
-
-            actionStatus.setText("Dipendente: " + dipendente.toString());
+            actionStatus.setText("Event: " + dipendente.toString());
 
             // Select a row
 

@@ -30,6 +30,8 @@ public class Server {
     public static String QUERY_UPDATE_LIST = "req_update_list";
     public static String QUERY_CREATE_PDF = "req_create_pdf";
 
+    public static String QUERY_SELECT_ALL_LIST_EVENT = "req_query_select_all_list_event";
+
 
 
     public static void main(String[] args) {
@@ -232,6 +234,7 @@ public class Server {
 
         return out;
     }
+
     public static String selectAllList(String query){
 
         String out = "";
@@ -369,6 +372,40 @@ public class Server {
 
                 out += res.getString("Nome")+"\n";
                 out += res.getString("Cognome")+"\n";
+
+
+            }
+
+
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return out;
+    }
+
+    public static String selectAllListEvent(String query){
+
+        String out = "";
+        try {
+
+            connection = ConnectionDB.getInstance().getConnection();
+
+            ptmt = connection.prepareStatement(query);
+
+            // ptmt.executeUpdate(query);
+
+            ResultSet res= ptmt.executeQuery(query);
+
+
+            out += "OK"+ "\n";
+            while (res.next()) {
+
+
+                out += res.getString("Hour")+"\n";
+                out += res.getString("Data")+"\n";
 
 
             }
