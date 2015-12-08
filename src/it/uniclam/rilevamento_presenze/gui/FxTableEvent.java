@@ -26,9 +26,9 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.awt.color.ColorSpace;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 public class FxTableEvent
@@ -68,7 +68,7 @@ public class FxTableEvent
 		primaryStage.setTitle("Pannello di Controllo:Responsabile Presenze");
 
 		// Users label
-		Label label = new Label("Tabella Dipendenti");
+		Label label = new Label("INCONGRUENZE");
         LabelSearch=new Label("CERCA");
         LabelSearch.setTextFill(Color.YELLOWGREEN);
 		label.setTextFill(Color.DARKBLUE);
@@ -84,8 +84,8 @@ public class FxTableEvent
 		table.setItems(data);
 		table.setEditable(true);
 //Vedere QUI
-		TableColumn hourCol = new TableColumn("Hour");
-		hourCol.setCellValueFactory(new PropertyValueFactory<Event, String>("Hour"));
+		TableColumn hourCol = new TableColumn("Ora");
+		hourCol.setCellValueFactory(new PropertyValueFactory<Event, String>("hour"));
 		hourCol.setCellFactory(TextFieldTableCell.forTableColumn());
 		hourCol.setOnEditCommit(new EventHandler<CellEditEvent<Event, String>>() {
 			@Override
@@ -97,16 +97,45 @@ public class FxTableEvent
 			}
 		});
 
-		final TableColumn dataCol = new TableColumn("Data");
-		dataCol.setCellValueFactory(new PropertyValueFactory<Event, String>("Data"));
-		dataCol.setCellFactory(TextFieldTableCell.forTableColumn());
-		dataCol.setOnEditCommit(new EventHandler<CellEditEvent<Event, String>>() {
-			@Override
-			public void handle(CellEditEvent<Event, String> t) {
-	EventJDBCDAO lj=new EventJDBCDAO();
-            ((Event) t.getTableView().getItems().get(
-                            t.getTablePosition().getRow())
-            ).setData(t.getNewValue());
+        TableColumn dataCol = new TableColumn("Data");
+        dataCol.setCellValueFactory(new PropertyValueFactory<Event, String>("data"));
+        dataCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        dataCol.setOnEditCommit(new EventHandler<CellEditEvent<Event, String>>() {
+            @Override
+            public void handle(CellEditEvent<Event, String> t) {
+
+                ((Event) t.getTableView().getItems().get(
+                        t.getTablePosition().getRow())
+                ).setData(t.getNewValue());
+            }
+        });
+
+        TableColumn typeCol = new TableColumn("IN/OUT");
+        typeCol.setCellValueFactory(new PropertyValueFactory<Event, String>("type_id"));
+        typeCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        typeCol.setOnEditCommit(new EventHandler<CellEditEvent<Event, String>>() {
+            @Override
+            public void handle(CellEditEvent<Event, String> t) {
+
+                ((Event) t.getTableView().getItems().get(
+                        t.getTablePosition().getRow())
+                ).setType_id(t.getNewValue());
+            }
+        });
+
+
+
+
+        final TableColumn userCol = new TableColumn("ID");
+        userCol.setCellValueFactory(new PropertyValueFactory<Event, String>("user_id"));
+        userCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        userCol.setOnEditCommit(new EventHandler<CellEditEvent<Event, String>>() {
+            @Override
+            public void handle(CellEditEvent<Event, String> t) {
+
+                ((Event) t.getTableView().getItems().get(
+                        t.getTablePosition().getRow())
+                ).setUser_id((t.getNewValue()));
 
                 //Aggiorno il valore nel database INIZIO:
                 int ix = table.getSelectionModel().getSelectedIndex();
@@ -117,6 +146,8 @@ public class FxTableEvent
 
                 String nome=table.getItems().get(ix).getHour().toString();
                 String cognome=table.getItems().get(ix).getData().toString();
+                        String user_id=table.getItems().get(ix).getUser_id().toString();
+                String type_id=table.getItems().get(ix).getType_id().toString();
                // System.out.println(autore+"tralalal");
                 //update
                 //QUERYlj.updateList(Server.QUERY_UPDATE_LIST, nome, cognome);
@@ -125,14 +156,47 @@ public class FxTableEvent
                 System.out.println("Ho modificato il valore di autori");
 			}
 		});
-
-		table.getColumns().setAll(hourCol, dataCol);
+//Dico le colonne quante sono
+		table.getColumns().setAll(userCol,dataCol,hourCol,typeCol);
 		table.setPrefWidth(450);
 		table.setPrefHeight(300);
 		table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
 		table.getSelectionModel().selectedIndexProperty().addListener(
 			new RowSelectChangeListener());
+
+
+        /********************************/
+        // Custom rendering of the table cell.
+       /* dataCol.setCellFactory(column -> {
+            return new TableCell<Event, String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+
+                    if (item == null || empty) {
+                        setText(null);
+                        setStyle(" -fx-background-color: brown");setTextFill(Color.CHOCOLATE);
+                    } else {
+                        // Format date.
+                        //setTextFill(Color.CHOCOLATE);
+System.out.println("Non vuota");
+                        // Style all dates in March with a different color.
+                        if (item == "12/10/2005") {
+                            System.out.println("Vera" + "12-10-2005");
+                            setTextFill(Color.CHOCOLATE);
+                            setStyle("-fx-background-color: yellow");
+                        } else {
+                            setTextFill(Color.BLACK);
+                          //  setStyle(" -fx-background-color: darkgoldenrod");
+                        }
+                    }
+                }
+            };
+        });*/
+
+
+        /********************************/
 
 		// Add and delete buttons
 		Button addbtn = new Button("Aggiungi");
@@ -143,7 +207,7 @@ public class FxTableEvent
         srcbtn.setOnAction(new SearchButtonListener());
         Button okbtn=new Button("OK");
         okbtn.setOnAction(new OKButtonListener());
-        Button detailsbtn=new Button("Dettagli");
+        Button detailsbtn=new Button("Vedi Incongruenza/e");
         detailsbtn.setOnAction(new DetailshButtonListener());
         Button backbtn=new Button("Annulla");
         backbtn.setOnAction(new SearchButtonListener());
@@ -196,20 +260,37 @@ public class FxTableEvent
 		@Override
 		public void changed(ObservableValue<? extends Number> ov, 
 				Number oldVal, Number newVal) {
-
+            table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            //table.requestFocus();
 			int ix = newVal.intValue();
 
 			if ((ix < 0) || (ix >= data.size())) {
 	
 				return; // invalid data
+
+
+
 			}
 
+
 			Event dipendente = data.get(ix);
+            //if (!data.get(ix).toString().isEmpty()){table.getSelectionModel().clearSelection();}
+if (ix < data.size()) {
+    if (!table.getSelectionModel().isEmpty()){
+       // table.getSelectionModel().clearAndSelect(4);
+       // table.getSelectionModel().clearSelection();
+        table.getSelectionModel().select(data.get(1));
+    }
+}
+            /*table.getSelectionModel().select(data.get(1));
+            table.getSelectionModel().select(data.get(2));
+            table.getSelectionModel().select(data.get(4));*/
+           //actionStatus.setText(dipendente.toString());
 
+            //System.out.println(dipendente.toString()+"toSTRING");
+            /******/
 
-           actionStatus.setText(dipendente.toString());
-
-            System.out.println(dipendente.toString()+"toSTRING");
+            /****/
 		}
 	}
 
@@ -224,7 +305,7 @@ public class FxTableEvent
         System.out.println("Sono passato da fuori");
 
         try {
-            String queryString = "SELECT * FROM event  ";
+            String queryString = "SELECT * FROM event";
             connection = getConnection();
 
             Statement st = connection.createStatement();
@@ -234,9 +315,15 @@ public class FxTableEvent
 
 String ora=res.getString("Hour");
                 String data= res.getString("Data");
-                list.add(new Event(ora, data));
+               String user_id=res.getString("User_ID");
+                //Integer user_id=res.getInt(4);
+                String type_id= res.getString("Type_ID");
+                list.add(new Event(user_id,data,ora,type_id));
+
+
 
             }
+
             //if(res.next()==false) { System.out.println("ACCESSO NEGATO:Badge non valido");}
 
         } catch (SQLException e) {
@@ -261,6 +348,9 @@ String ora=res.getString("Hour");
 
         return data;
     }
+
+
+
 	
 //Aggiunta di un Event alla tabella OK
     private class AddButtonListener implements EventHandler<ActionEvent> {
@@ -283,8 +373,8 @@ String ora=res.getString("Hour");
         public void handle(ActionEvent e) {
 
             EventJDBCDAO lj=new EventJDBCDAO();
-            Event dipendente = dipendente =new Event("",TextboxInsertPK.getText());
-            data.add(dipendente);
+           // Event dipendente = dipendente =new Event("",TextboxInsertPK.getText(),1);
+           // data.add(dipendente);
 
             int row = data.size() - 1;
             System.out.println(data.size());
@@ -367,40 +457,109 @@ EventJDBCDAO lj=new EventJDBCDAO();
 EventJDBCDAO lj=new EventJDBCDAO();
         @Override
         public void handle(ActionEvent e) {
+String stringa=table.getItems().get(4).getUser_id().toString();
+if (Objects.equals(stringa, "2")){
+    System.out.println("if "+stringa);
+    table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    table.requestFocus();
+    table.getSelectionModel().clearSelection();
+    table.getSelectionModel().select(data.get(1));
+    table.getSelectionModel().select(data.get(2));
+    table.getSelectionModel().select(data.get(4));
+    //table.getSelectionModel().getSelectedIndex();
+    // table.setBackground(Color (table.getColumns().get(1)));
+    //tableView.getSelectionModel().select(cell.getIndex());
+    /*if (!data.isEmpty()) {
+        System.out.println("False enter");
+        table.getSelectionModel().clearSelection();
+    } else {
+        System.out.println("Select");}*/
 
+    /*if (cell.isSelected() ) {
+		System.out.println("False enter");
+		tableView.getSelectionModel().clearSelection(cell.getIndex(), col);
+	} else {
+		System.out.println("Select");
+		tableView.getSelectionModel().select(cell.getIndex(), col);*/
+
+}else {
+    System.out.println("else "+stringa);
+}
 
 // Get selected row and delete
-            int ix = table.getSelectionModel().getSelectedIndex();
-            Event dipendente = (Event) table.getSelectionModel().getSelectedItem();
-            System.out.println(table.getItems().get(ix).toString());
+           // if ()
 
-            //System.out.println(table.getItems().get(ix).getTitle().toString());//Titolo X selezionato OK
-            //System.out.println(table.getItems().get(ix).getAuthor().toString());//Autore X selezionato OK
-         /*   String nome=table.getItems().get(ix).getNome().toString();
-            String cognome=table.getItems().get(ix).getCognome().toString();
-*/
-         //  lj.MySQL_GridView(Server.QUERY_ORDERDATE,nome, cognome);
+           /* table.requestFocus();
+            table.getSelectionModel().selectAll();
+            table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);*/
+            // set cell value factories
+
+          /*  Connection connection = null;
+            PreparedStatement ptmt= null;
+            ResultSet resultSet = null;
+            EventJDBCDAO lj=new EventJDBCDAO();
+            List list = new ArrayList();
 
 
-            actionStatus.setText("Event: " + dipendente.toString());
+            System.out.println("Sono passato da fuori");
 
-            // Select a row
+            try {
+                String queryString = "SELECT * FROM event";
+                connection = getConnection();
 
-            if (table.getItems().size() == 0) {
+                Statement st = connection.createStatement();
+                ResultSet res = st.executeQuery(queryString);
+                int ix = table.getSelectionModel().getSelectedIndex();//int ix = 1;
+                System.out.println("X:"+ix);
+                while (res.next()==true ) {
 
-                actionStatus.setText("Nessun record Trovato !");
-                return;
-            }
+                    String ora=res.getString("Hour");
+                    String data= res.getString("Data");
+                    String user_id=res.getString("User_ID");
+                    //Integer user_id=res.getInt(4);
+                    String type_id= res.getString("Type_ID");
+                    System.out.println(ora+"+"+data+"+"+user_id+"+"+type_id);
+                    System.out.println("PRINTLN+"+table.getItems().get(0).getHour().toString());
+                    if (table.getItems().get(0).getHour().toString()=="22:12:12"){
+                        System.out.println("Stringa Data =" + data);
 
-            if (ix != 0) {
+                    }else {System.out.println("NO STRING ="+data);}
 
-                ix =ix;
-            }
 
-            table.requestFocus();
-            table.getSelectionModel().select(ix);
-            table.getFocusModel().focus(ix);
-        
+                    //c.setBackground(java.awt.Color.GREEN); {
+                        //table.requestFocus();
+                      //.setCellFactory(cellFactory
+
+                        //table.getSelectionModel().select(table.getItems().get(3));
+                        System.out.println("SONO dentro");
+                        //table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+                    }
+                    //Event dipendente = (Event) table.getSelectionModel().getSelectedItem();
+                   // System.out.println(table.getItems().get(ix).toString());
+ix++;
+                //System.out.println(table.getItems().);
+                //if(res.next()==false) { System.out.println("ACCESSO NEGATO:Badge non valido");}
+
+            } catch (SQLException ae) {
+                ae.printStackTrace();
+            } finally {
+                try {
+
+                    if (resultSet != null)
+                        resultSet.close();
+                    if (ptmt != null)
+                        ptmt.close();
+                    if (connection != null)
+                        connection.close();
+                } catch (SQLException ae) {
+                    ae.printStackTrace();
+                } catch (Exception ae) {
+                    ae.printStackTrace();
+                }
+
+            }*/
+
 /*************************/
         }//Fine Handle()
     }//Fine search listner button

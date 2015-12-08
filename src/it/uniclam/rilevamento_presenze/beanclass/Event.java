@@ -9,18 +9,18 @@ import javafx.beans.property.SimpleStringProperty;
 public class Event {
     private SimpleStringProperty hour;//NOme=HOUR
     private SimpleStringProperty data;//COgnome=Data
-    private SimpleIntegerProperty user_id;
-    private SimpleIntegerProperty type_id;
+    private SimpleStringProperty user_id;
+    private SimpleStringProperty type_id;
 
     public Event() {
     }
 
-    public Event(String s1, String s2/*,Integer s3,Integer s4*/) {
+    public Event(String s1, String s2,String s3,String s4) {
 
-        hour = new SimpleStringProperty(s1);
+        hour = new SimpleStringProperty(s3);
         data = new SimpleStringProperty(s2);
-        /*user_id = new SimpleIntegerProperty(s3);
-        type_id = new SimpleIntegerProperty(s4);*/
+        user_id = new SimpleStringProperty(s1);
+        type_id = new SimpleStringProperty(s4);
     }
 
     public String getHour() {
@@ -41,20 +41,20 @@ public class Event {
         data.set(s);
     }
 
-    public Integer getType_id() {
+    public String getType_id() {
 
         return type_id.get();
     }
-    public void setType_id(Integer s) {
+    public void setType_id(String s) {
 
         type_id.set(s);
     }
 
-    public Integer getUser_id() {
+    public String getUser_id() {
 
         return user_id.get();
     }
-    public void setUser_id(Integer s) {
+    public void setUser_id(String s) {
 
         user_id.set(s);
     }
@@ -62,6 +62,6 @@ public class Event {
     @Override
     public String toString() {
 
-        return (data.get() + " " + hour.get()/*+type_id.get()+" "+user_id*/);
+        return (user_id.get()+" "+data.get() + " " + hour.get()+" "+type_id.get());
     }
 }

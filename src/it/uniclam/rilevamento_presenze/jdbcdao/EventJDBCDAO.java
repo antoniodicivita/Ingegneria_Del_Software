@@ -102,7 +102,7 @@ public class EventJDBCDAO {Connection connection = null;
 
                 ora = in.readLine();
                 String data = in.readLine();
-                list.add(new Event(ora,data));
+              //  list.add(new Event(ora,data));
 
 
 
