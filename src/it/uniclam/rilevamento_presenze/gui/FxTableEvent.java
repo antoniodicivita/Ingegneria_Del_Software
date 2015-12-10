@@ -167,33 +167,7 @@ public class FxTableEvent
 
 
         /********************************/
-        // Custom rendering of the table cell.
-       /* dataCol.setCellFactory(column -> {
-            return new TableCell<Event, String>() {
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
 
-                    if (item == null || empty) {
-                        setText(null);
-                        setStyle(" -fx-background-color: brown");setTextFill(Color.CHOCOLATE);
-                    } else {
-                        // Format date.
-                        //setTextFill(Color.CHOCOLATE);
-System.out.println("Non vuota");
-                        // Style all dates in March with a different color.
-                        if (item == "12/10/2005") {
-                            System.out.println("Vera" + "12-10-2005");
-                            setTextFill(Color.CHOCOLATE);
-                            setStyle("-fx-background-color: yellow");
-                        } else {
-                            setTextFill(Color.BLACK);
-                          //  setStyle(" -fx-background-color: darkgoldenrod");
-                        }
-                    }
-                }
-            };
-        });*/
 
 
         /********************************/
@@ -279,16 +253,11 @@ if (ix < data.size()) {
     if (!table.getSelectionModel().isEmpty()){
        // table.getSelectionModel().clearAndSelect(4);
        // table.getSelectionModel().clearSelection();
-        table.getSelectionModel().select(data.get(1));
+        //table.getSelectionModel().select(data.get(1));
+        //call();
+
     }
 }
-            /*table.getSelectionModel().select(data.get(1));
-            table.getSelectionModel().select(data.get(2));
-            table.getSelectionModel().select(data.get(4));*/
-           //actionStatus.setText(dipendente.toString());
-
-            //System.out.println(dipendente.toString()+"toSTRING");
-            /******/
 
             /****/
 		}
@@ -305,7 +274,7 @@ if (ix < data.size()) {
         System.out.println("Sono passato da fuori");
 
         try {
-            String queryString = "SELECT * FROM event";
+            String queryString = "SELECT event.Data, Nome, Cognome, Name_Type FROM (event  JOIN user ON User_ID=ID_User) JOIN type ON Type_ID=ID_Type  ORDER BY STR_TO_DATE(Data, '%d%b%Y') DESC, User_ID";
             connection = getConnection();
 
             Statement st = connection.createStatement();
@@ -313,11 +282,11 @@ if (ix < data.size()) {
 
             while (res.next()==true) {
 
-String ora=res.getString("Hour");
+                String ora=res.getString("Nome");
                 String data= res.getString("Data");
-               String user_id=res.getString("User_ID");
+               String user_id=res.getString("Cognome");
                 //Integer user_id=res.getInt(4);
-                String type_id= res.getString("Type_ID");
+                String type_id= res.getString("Name_Type");
                 list.add(new Event(user_id,data,ora,type_id));
 
 
@@ -453,116 +422,69 @@ EventJDBCDAO lj=new EventJDBCDAO();
         }//Fine Handle()
     }//Fine search listner button
 
-    private class DetailshButtonListener implements EventHandler<ActionEvent> {
+    public class DetailshButtonListener implements EventHandler<ActionEvent> {
 EventJDBCDAO lj=new EventJDBCDAO();
         @Override
         public void handle(ActionEvent e) {
-String stringa=table.getItems().get(4).getUser_id().toString();
-if (Objects.equals(stringa, "2")){
-    System.out.println("if "+stringa);
-    table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    table.requestFocus();
-    table.getSelectionModel().clearSelection();
-    table.getSelectionModel().select(data.get(1));
-    table.getSelectionModel().select(data.get(2));
-    table.getSelectionModel().select(data.get(4));
-    //table.getSelectionModel().getSelectedIndex();
-    // table.setBackground(Color (table.getColumns().get(1)));
-    //tableView.getSelectionModel().select(cell.getIndex());
-    /*if (!data.isEmpty()) {
-        System.out.println("False enter");
-        table.getSelectionModel().clearSelection();
-    } else {
-        System.out.println("Select");}*/
+            String stringa = table.getItems().get(4).getUser_id().toString();
+//if (Objects.equals(stringa, "1")){
+            System.out.println("if " + stringa);
+          /*  table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            table.requestFocus();
+            table.getSelectionModel().clearSelection();
+            table.getSelectionModel().select(data.get(1));
+            table.getSelectionModel().select(data.get(2));
+            table.getSelectionModel().select(data.get(4));*/
+            //Numero elementi nella tabella
+   /*
+}int i=0;
+  /*          while (i<lenght-1) {
+                if (Objects.equals(table.getItems().get(i).getUser_id().toString(), table.getItems().get(i+1).getUser_id().toString()) &&
+                        Objects.equals(table.getItems().get(i).getData().toString(), table.getItems().get(i+1).getData().toString()) &&
+                        Objects.equals(table.getItems().get(i).getType_id().toString(), table.getItems().get(i+1).getType_id().toString())) {
+                    table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+                    table.requestFocus();
 
-    /*if (cell.isSelected() ) {
-		System.out.println("False enter");
-		tableView.getSelectionModel().clearSelection(cell.getIndex(), col);
-	} else {
-		System.out.println("Select");
-		tableView.getSelectionModel().select(cell.getIndex(), col);*/
+                    table.getSelectionModel().select(data.get(i));
+                    table.getSelectionModel().select(data.get(i+1));
 
-}else {
-    System.out.println("else "+stringa);
-}
-
-// Get selected row and delete
-           // if ()
-
-           /* table.requestFocus();
-            table.getSelectionModel().selectAll();
-            table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);*/
-            // set cell value factories
-
-          /*  Connection connection = null;
-            PreparedStatement ptmt= null;
-            ResultSet resultSet = null;
-            EventJDBCDAO lj=new EventJDBCDAO();
-            List list = new ArrayList();
-
-
-            System.out.println("Sono passato da fuori");
-
-            try {
-                String queryString = "SELECT * FROM event";
-                connection = getConnection();
-
-                Statement st = connection.createStatement();
-                ResultSet res = st.executeQuery(queryString);
-                int ix = table.getSelectionModel().getSelectedIndex();//int ix = 1;
-                System.out.println("X:"+ix);
-                while (res.next()==true ) {
-
-                    String ora=res.getString("Hour");
-                    String data= res.getString("Data");
-                    String user_id=res.getString("User_ID");
-                    //Integer user_id=res.getInt(4);
-                    String type_id= res.getString("Type_ID");
-                    System.out.println(ora+"+"+data+"+"+user_id+"+"+type_id);
-                    System.out.println("PRINTLN+"+table.getItems().get(0).getHour().toString());
-                    if (table.getItems().get(0).getHour().toString()=="22:12:12"){
-                        System.out.println("Stringa Data =" + data);
-
-                    }else {System.out.println("NO STRING ="+data);}
-
-
-                    //c.setBackground(java.awt.Color.GREEN); {
-                        //table.requestFocus();
-                      //.setCellFactory(cellFactory
-
-                        //table.getSelectionModel().select(table.getItems().get(3));
-                        System.out.println("SONO dentro");
-                        //table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-                    }
-                    //Event dipendente = (Event) table.getSelectionModel().getSelectedItem();
-                   // System.out.println(table.getItems().get(ix).toString());
-ix++;
-                //System.out.println(table.getItems().);
-                //if(res.next()==false) { System.out.println("ACCESSO NEGATO:Badge non valido");}
-
-            } catch (SQLException ae) {
-                ae.printStackTrace();
-            } finally {
-                try {
-
-                    if (resultSet != null)
-                        resultSet.close();
-                    if (ptmt != null)
-                        ptmt.close();
-                    if (connection != null)
-                        connection.close();
-                } catch (SQLException ae) {
-                    ae.printStackTrace();
-                } catch (Exception ae) {
-                    ae.printStackTrace();
+                    table.getSelectionModel().focus(4);
+                    //table.getItems().
+                    //  System.out.println("I:"+i+" J:"+ j +"DataA: "+table.getItems().get(i).getUser_id().toString() +"DataB: "+table.getItems().get(i).getData().toString()+" + "+ table.getItems().get(j).getUser_id().toString()+" "+table.getItems().get(j).getData().toString());
                 }
-
+                i++;
             }*/
-
+call();
 /*************************/
         }//Fine Handle()
     }//Fine search listner button
+
+
+
+
+    public void call(){
+
+        int lenght = table.getItems().size();//Numero elementi nella tabella
+        int i=0;
+        while (i<lenght-1) {
+            if (Objects.equals(table.getItems().get(i).getUser_id().toString(), table.getItems().get(i+1).getUser_id().toString()) &&
+                    Objects.equals(table.getItems().get(i).getData().toString(), table.getItems().get(i+1).getData().toString()) &&
+                    Objects.equals(table.getItems().get(i).getType_id().toString(), table.getItems().get(i+1).getType_id().toString())) {
+                table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+                table.requestFocus();
+
+                table.getSelectionModel().select(data.get(i));
+                table.getSelectionModel().select(data.get(i+1));
+
+                table.getSelectionModel().focus(4);
+                //table.getItems().
+                //  System.out.println("I:"+i+" J:"+ j +"DataA: "+table.getItems().get(i).getUser_id().toString() +"DataB: "+table.getItems().get(i).getData().toString()+" + "+ table.getItems().get(j).getUser_id().toString()+" "+table.getItems().get(j).getData().toString());
+            }
+            i++;
+        }
+
+    }
+
 
 
 }
