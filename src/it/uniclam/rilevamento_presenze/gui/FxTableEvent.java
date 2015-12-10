@@ -11,6 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -18,6 +19,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -27,6 +29,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.awt.color.ColorSpace;
+import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 
@@ -36,7 +39,8 @@ public class FxTableEvent
 
     /*CONNE DB*/
 
-
+    private Stage primaryStage;
+    private BorderPane rootLayout;
     public TextField TextboxSearch;
     public Label LabelSearch;
     public TextField TextboxInsertPK;
@@ -62,11 +66,23 @@ public class FxTableEvent
 		Application.launch(args);
 	}
 
+    public void initRootLayout() {
+        // Load root layout from fxml file.
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(FxTableEvent.class.getResource("TESTaddress/view/RootLayout.fxml"));
+        // rootLayout = (BorderPane) loader.load();
+
+        // Show the scene containing the root layout.
+       /* Scene scene = new Scene(rootLayout);
+        primaryStage.setScene(scene);
+        primaryStage.show();*/
+    }
+
 	@Override
 	public void start(Stage primaryStage) {
-
+        this.primaryStage = primaryStage;
 		primaryStage.setTitle("Pannello di Controllo:Responsabile Presenze");
-
+       // initRootLayout();
 		// Users label
 		Label label = new Label("INCONGRUENZE");
         LabelSearch=new Label("CERCA");
@@ -222,8 +238,9 @@ public class FxTableEvent
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
-		// Select the first row
+		// Seleziona la prima riga
 		table.getSelectionModel().select(0);
+
 		Event dipendente = table.getSelectionModel().getSelectedItem();
 		actionStatus.setText(dipendente.toString());
 		
@@ -235,28 +252,21 @@ public class FxTableEvent
 		public void changed(ObservableValue<? extends Number> ov, 
 				Number oldVal, Number newVal) {
             table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            //table.requestFocus();
+            table.requestFocus();
 			int ix = newVal.intValue();
 
-			if ((ix < 0) || (ix >= data.size())) {
-	
-				return; // invalid data
+			if ((ix < 0) || (ix >= data.size())) {return;}// invalid data
 
-
-
-			}
-
-
-			Event dipendente = data.get(ix);
-            //if (!data.get(ix).toString().isEmpty()){table.getSelectionModel().clearSelection();}
 if (ix < data.size()) {
+
     if (!table.getSelectionModel().isEmpty()){
-       // table.getSelectionModel().clearAndSelect(4);
-       // table.getSelectionModel().clearSelection();
-        //table.getSelectionModel().select(data.get(1));
-        //call();
+
+        call();
+        //table.getSelectionModel().clearSelection(0);NI
+
 
     }
+    else {call();}
 }
 
             /****/
@@ -427,33 +437,7 @@ EventJDBCDAO lj=new EventJDBCDAO();
         @Override
         public void handle(ActionEvent e) {
             String stringa = table.getItems().get(4).getUser_id().toString();
-//if (Objects.equals(stringa, "1")){
-            System.out.println("if " + stringa);
-          /*  table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            table.requestFocus();
-            table.getSelectionModel().clearSelection();
-            table.getSelectionModel().select(data.get(1));
-            table.getSelectionModel().select(data.get(2));
-            table.getSelectionModel().select(data.get(4));*/
-            //Numero elementi nella tabella
-   /*
-}int i=0;
-  /*          while (i<lenght-1) {
-                if (Objects.equals(table.getItems().get(i).getUser_id().toString(), table.getItems().get(i+1).getUser_id().toString()) &&
-                        Objects.equals(table.getItems().get(i).getData().toString(), table.getItems().get(i+1).getData().toString()) &&
-                        Objects.equals(table.getItems().get(i).getType_id().toString(), table.getItems().get(i+1).getType_id().toString())) {
-                    table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-                    table.requestFocus();
 
-                    table.getSelectionModel().select(data.get(i));
-                    table.getSelectionModel().select(data.get(i+1));
-
-                    table.getSelectionModel().focus(4);
-                    //table.getItems().
-                    //  System.out.println("I:"+i+" J:"+ j +"DataA: "+table.getItems().get(i).getUser_id().toString() +"DataB: "+table.getItems().get(i).getData().toString()+" + "+ table.getItems().get(j).getUser_id().toString()+" "+table.getItems().get(j).getData().toString());
-                }
-                i++;
-            }*/
 call();
 /*************************/
         }//Fine Handle()
