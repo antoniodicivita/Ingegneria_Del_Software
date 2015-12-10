@@ -235,6 +235,7 @@ public class FxTableEvent
 
 		// Scene
 		Scene scene = new Scene(vbox, 500, 550); // w x h
+        table.getStylesheets().add(getClass().getResource("table.css").toExternalForm());
 		primaryStage.setScene(scene);
 		primaryStage.show();
 

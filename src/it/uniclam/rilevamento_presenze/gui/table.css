@@ -1,0 +1,10 @@
+.table-row-cell:selected {
+    -fx-background-color: red ;
+}
+
+.button{
+    -fx-text-fill: royalblue;
+    -fx-background-color: yellow;}
+.table-row-cell:row-selection{-fx-background-color: greenyellow ;}
+
+.table-row-cell:focused{-fx-background-color: greenyellow ;}
