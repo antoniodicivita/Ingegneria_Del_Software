@@ -104,7 +104,7 @@ public class DipendenteJDBCDAO {
 
                     nome = in.readLine();
                     String cognome = in.readLine();
-                    list.add(new Dipendente(nome, cognome));
+                    list.add(new Dipendente(nome, cognome,"10"));
 
 
 
@@ -124,63 +124,6 @@ public class DipendenteJDBCDAO {
         return data;
         }
 
-
-/*
-
-    public void MySQL_GridView1(String nome, String cognome) {
-        JFrame frame = new JFrame("Dettagli Eventi");
-        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        String columnNames[] = {"NOME", "COGNOME", "IN/OUT", "DATA", "ORA"};
-
-        String queryString = "SELECT DISTINCT Nome,Cognome, Name_Type, Data, Hour FROM (type JOIN event ON Type_ID=ID_Type) JOIN user ON User_ID=ID_User WHERE Nome='" + nome + "' AND Cognome='" + cognome + "' ORDER BY (str_to_date(Data, '%d%b%Y')) DESC  , (str_to_date(Hour, '%h:%i:%s')) DESC";
-
-        try {
-            connection = getConnection();
-            Statement st = connection.createStatement();
-            ResultSet res = st.executeQuery(queryString);
-            System.out.println("Prepare sctatement OK");
-
-            int rowcount = 0;
-            if (res.last()) {
-
-                rowcount = res.getRow();
-                res.beforeFirst();
-            }
-
-            Object rowData[][] = new Object[rowcount][];
-            //String line=in.readLine();
-            int count = 0;
-
-
-            if (res.last()) {
-                rowcount = res.getRow();
-                res.beforeFirst();
-            }
-
-
-            while (res.next()) {
-                rowData[count] = new Object[]{res.getString(1), res.getString(2), res.getString(3), res.getString(4), res.getString(5)};
-                count++;
-            }
-
-            JTable table = new JTable(rowData, columnNames);
-            JScrollPane scrollPane = new JScrollPane(table);
-            frame.add(scrollPane, BorderLayout.CENTER);
-            frame.pack();//frame.setSize(AUTO)
-            frame.setVisible(true);
-
-            connection.close();
-
-       } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-
-       /* } catch (Exception e) {
-            System.out.println("Query Ricerca Fallita");
-        }
-    }
-*/
 
 
     public void MySQL_GridView(String type_query,String nome, String cognome){
@@ -239,37 +182,7 @@ public class DipendenteJDBCDAO {
 
     }
 
-/*
-    public void updateList(String valueONE,String valueTWO) {
 
-
-        try {//NB la chiave primaria è univoca
-            String queryString = "UPDATE user SET Cognome='"+valueTWO+"' WHERE Nome='"+valueONE+"'AND Cognome'"+valueTWO+"'";
-            connection = getConnection();
-            ptmt = connection.prepareStatement(queryString);
-
-            ptmt.executeUpdate();
-            System.out.println("Aggiornamento OK");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (ptmt != null)
-                    ptmt.close();
-                if (connection != null)
-                    connection.close();
-            }
-
-            catch (SQLException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-
-            }
-        }//Fine SQL
-
-    }
-*/
 
     public void updateList(String type_query,String nome,String cognome) {
 
@@ -312,7 +225,7 @@ public class DipendenteJDBCDAO {
                 nome = in.readLine();
                 String cognome = in.readLine();
 
-                data.addAll(new Dipendente(nome, cognome));
+                data.addAll(new Dipendente(nome, cognome,""));
 
             }
 

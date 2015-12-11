@@ -130,9 +130,9 @@ public class Server {
 
                     else if(command.equals(QUERY_UPDATE_LIST)){
 
-                        String nome = in.readLine().replace("valueONE", "");
-                        String cognome = in.readLine().replace("valueTWO", "");
-                        String query = "UPDATE user SET Cognome='"+nome+"' AND Nome='"+cognome+"' WHERE Nome='"+nome+"'AND Cognome'"+cognome+"'";
+                        String nome = in.readLine().replace("nome", "");
+                        String cognome = in.readLine().replace("", "cognome");
+                        String query = "UPDATE user SET Cognome='"+cognome+"' , Nome='"+nome+"' WHERE ID_User=10";
                         updateList(query);
                         s.close();
                     }

@@ -35,6 +35,7 @@ import java.sql.*;
 
 public class FxTableUser
 		extends Application {
+//temp
 
     /*CONNE DB*/
 
@@ -86,6 +87,12 @@ public class FxTableUser
 		table.setItems(data);
 		table.setEditable(true);
 //Vedere QUI
+
+
+
+
+
+        //II COl
 		TableColumn titleCol = new TableColumn("Cognome");
 		titleCol.setCellValueFactory(new PropertyValueFactory<Dipendente, String>("Cognome"));
 		titleCol.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -96,10 +103,22 @@ public class FxTableUser
 				((Dipendente) t.getTableView().getItems().get(
 					t.getTablePosition().getRow())
 				).setCognome(t.getNewValue());
+
+                //Modifica dei campi quando faccio invio (COLONNA 1)
+                int ix = table.getSelectionModel().getSelectedIndex();
+                Dipendente dipendente = (Dipendente) table.getSelectionModel().getSelectedItem();
+                System.out.println(ix);
+                String nome=table.getItems().get(ix).getNome().toString();
+                String cognome=table.getItems().get(ix).getCognome().toString();
+                String id_employee=table.getItems().get(ix).getId_employee().toString();
+                update(cognome,nome,id_employee);
+                System.out.println("Ho modificato il valore di COL 1");
+
+
 			}
 		});
 
-		final TableColumn authorCol = new TableColumn("Nome");
+		TableColumn authorCol = new TableColumn("Nome");
 		authorCol.setCellValueFactory(new PropertyValueFactory<Dipendente, String>("Nome"));
 		authorCol.setCellFactory(TextFieldTableCell.forTableColumn());
 		authorCol.setOnEditCommit(new EventHandler<CellEditEvent<Dipendente, String>>() {
@@ -119,16 +138,47 @@ public class FxTableUser
 
                 String nome=table.getItems().get(ix).getNome().toString();
                 String cognome=table.getItems().get(ix).getCognome().toString();
+                String id_employee=table.getItems().get(ix).getId_employee().toString();
                // System.out.println(autore+"tralalal");
                 //update
-                lj.updateList(Server.QUERY_UPDATE_LIST, nome, cognome);
+               // lj.updateList(Server.QUERY_UPDATE_LIST, nome, cognome);
                 //Aggiorno il valore nel database FINE:
-
-                System.out.println("Ho modificato il valore di autori");
+                update(cognome,nome,id_employee);
+                System.out.println("Ho modificato il valore di COL 2");
 			}
 		});
 
-		table.getColumns().setAll(titleCol, authorCol);
+
+        //II Final
+        final TableColumn employeeCol = new TableColumn("ID");
+        employeeCol.setCellValueFactory(new PropertyValueFactory<Dipendente, String>("id_employee"));
+        employeeCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        employeeCol.setOnEditCommit(new EventHandler<CellEditEvent<Dipendente, String>>() {
+            @Override
+            public void handle(CellEditEvent<Dipendente, String> t) {
+
+                ((Dipendente) t.getTableView().getItems().get(
+                        t.getTablePosition().getRow())
+                ).setId_employee(t.getNewValue());
+
+                //Modifica dei campi quando faccio invio (COLONNA 1)
+                int ix = table.getSelectionModel().getSelectedIndex();
+                Dipendente dipendente = (Dipendente) table.getSelectionModel().getSelectedItem();
+                System.out.println(ix);
+                String nome=table.getItems().get(ix).getNome().toString();
+                String cognome=table.getItems().get(ix).getCognome().toString();
+                String id_employee=table.getItems().get(ix).getId_employee().toString();
+                update(cognome,nome,id_employee);
+                System.out.println("Ho modificato il valore di COL 1");
+
+
+            }
+        });
+
+
+
+
+		table.getColumns().setAll(titleCol, authorCol,employeeCol);
 		table.setPrefWidth(450);
 		table.setPrefHeight(300);
 		table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -245,7 +295,7 @@ public class FxTableUser
         public void handle(ActionEvent e) {
 
             DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
-            Dipendente dipendente = dipendente =new Dipendente("",TextboxInsertPK.getText());
+            Dipendente dipendente = dipendente =new Dipendente("",TextboxInsertPK.getText(),"");
             data.add(dipendente);
 
             int row = data.size() - 1;
@@ -366,6 +416,44 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
 /*************************/
         }//Fine Handle()
     }//Fine search listner button
+
+
+
+
+
+    //TEMP
+    public void update(String stringa1,String stringa2,String stringa3) {
+        Connection connection = null;
+        PreparedStatement ptmt = null,ptmt2 = null;
+        ResultSet resultSet = null;
+        try {
+            String queryString = "UPDATE user SET Cognome=?,Nome=? WHERE ID_User='"+stringa3+"'";
+            connection = getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setString(1, stringa1);
+            ptmt.setString(2, stringa2);
+
+            //ptmt.setString(2, UtenteBean.getTelefono());
+            ptmt.executeUpdate();
+            System.out.println("Aggiornamento OK");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ptmt != null)
+                    ptmt.close();
+                if (connection != null)
+                    connection.close();
+            }
+
+            catch (SQLException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
+        }
+    }
 
 
 }

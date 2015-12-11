@@ -221,7 +221,7 @@ public class EventJDBCDAO {Connection connection = null;
                 nome = in.readLine();
                 String cognome = in.readLine();
 
-                data.addAll(new Dipendente(nome, cognome));
+                data.addAll(new Dipendente("",nome, cognome));
 
             }
 

@@ -6,14 +6,16 @@ public class Dipendente {
 
     private SimpleStringProperty Nome;//Hour;title
 	private SimpleStringProperty Cognome;//Data;//author
+    private SimpleStringProperty id_employee;//Dipendente
 
     public Dipendente() {
     }
 
-	public Dipendente(String s1, String s2) {
+	public Dipendente(String s1, String s2,String s3) {
 
         Nome = new SimpleStringProperty(s1);
         Cognome = new SimpleStringProperty(s2);
+        id_employee=new SimpleStringProperty(s3);
     }
 
     public String getNome() {
@@ -33,10 +35,20 @@ public class Dipendente {
 	
         Cognome.set(s);
     }
+
+    public String getId_employee() {
+        return id_employee.get();
+    }
+
+    public void setId_employee(String s) {
+        id_employee.set(s);
+    }
 	
     @Override
     public String toString() {
 	
-        return (Cognome.get() + " " + Nome.get());
+        return (Cognome.get() + " " + Nome.get()+" "+id_employee.get());
     }
+
+
 }

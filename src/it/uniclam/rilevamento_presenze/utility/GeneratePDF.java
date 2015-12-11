@@ -34,7 +34,7 @@ public class GeneratePDF {
 
 	public static void main(String[] args) {
         try {
-			OutputStream file = new FileOutputStream(new File("C:\\Test.pdf"));
+			OutputStream file = new FileOutputStream(new File("C:\\Users\\Chriz 7X\\Documents\\Test.pdf"));
 
 			Document document = new Document();
 			PdfWriter.getInstance(document, file);
