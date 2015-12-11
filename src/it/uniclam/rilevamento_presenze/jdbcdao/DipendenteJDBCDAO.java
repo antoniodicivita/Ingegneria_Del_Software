@@ -105,8 +105,9 @@ public class DipendenteJDBCDAO {
                     nome = in.readLine();
                     String cognome = in.readLine();
                     String id = in.readLine();
-                    list.add(new Dipendente(nome, cognome,id));
-
+                    if(nome!=null && cognome !=null) {
+                        list.add(new Dipendente(nome, cognome, id));
+                    }
 
 
                     System.out.println("STAMPA: " + nome + " e: " + cognome);
@@ -143,34 +144,38 @@ public class DipendenteJDBCDAO {
 
             int count=0;
 
-            String line=in.readLine();
-            int countrow =Integer.parseInt(line);
-            Object rowData[][] = new Object[countrow][];
+            String Nome=in.readLine();
+            if(Nome.equals("OK")) {
+                Nome=in.readLine();
+                int countrow = Integer.parseInt(Nome);
+                Object rowData[][] = new Object[countrow][];
 
 
-            while(line.length()>0&&count<countrow){
+                while (nome.length() > 0 && count < countrow) {
 
-                String Nome=in.readLine();
-                String Cognome=in.readLine();
-                String INOUT=in.readLine();
-                String Data=in.readLine();
-                String Ora=in.readLine();
+                    Nome = in.readLine();
+                    String Cognome = in.readLine();
+                    String INOUT = in.readLine();
+                    String Data = in.readLine();
+                    String Ora = in.readLine();
 
 
-                rowData[count] = new Object[]{Nome,Cognome,INOUT,Data,Ora};
+                    rowData[count] = new Object[]{Nome, Cognome, INOUT, Data, Ora};
 
-                count++;
-                System.out.println(Nome+Cognome+INOUT+Data+Ora);
+                    count++;
+                    System.out.println(nome + Cognome + INOUT + Data + Ora);
 
+
+                }
+                s.close();
+
+                JTable table = new JTable(rowData, columnNames);
+                JScrollPane scrollPane = new JScrollPane(table);
+                frame.add(scrollPane, BorderLayout.CENTER);
+                frame.pack();//frame.setSize(AUTO)
+                frame.setVisible(true);
 
             }
-            s.close();
-
-            JTable table = new JTable(rowData, columnNames);
-            JScrollPane scrollPane = new JScrollPane(table);
-            frame.add(scrollPane, BorderLayout.CENTER);
-            frame.pack();//frame.setSize(AUTO)
-            frame.setVisible(true);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -182,6 +187,67 @@ public class DipendenteJDBCDAO {
 
 
     }
+
+    public void details(String type_query,String nome, String cognome){
+        JFrame frame = new JFrame("Informazioni dipendenti");
+        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        String columnNames[] = { "NOME", "COGNOME", "ORARI","PAUSA PRANZO","STRAORDINARIO" };
+        String req =  type_query +"\n" + nome+"\n" + cognome+"\n";
+
+
+        try {
+            Socket s  = new Socket(Server.HOST, Server.PORT);
+
+            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            out.println(req);
+
+            int count=0;
+
+            String Nome=in.readLine();
+            if(Nome.equals("OK")) {
+                Nome = in.readLine();
+                int countrow = Integer.parseInt(Nome);
+                Object rowData[][] = new Object[countrow][];
+
+
+                while (Nome.length() > 0 && count < countrow) {
+
+
+                    Nome = in.readLine();
+                    String Cognome = in.readLine();
+                    String Orari = in.readLine();
+                    String pausa_pranzo = in.readLine();
+                    String straordinario = in.readLine();
+
+
+                    rowData[count] = new Object[]{Nome, Cognome, Orari,pausa_pranzo,straordinario};
+
+                    count++;
+                   // System.out.println(Nome + Cognome + INOUT + Data + Ora);
+
+
+                }
+                s.close();
+
+                JTable table = new JTable(rowData, columnNames);
+                JScrollPane scrollPane = new JScrollPane(table);
+                frame.add(scrollPane, BorderLayout.CENTER);
+                frame.pack();//frame.setSize(AUTO)
+                frame.setVisible(true);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+
+
+    }
+
 
 
 
@@ -226,8 +292,9 @@ public class DipendenteJDBCDAO {
                 nome = in.readLine();
                 String cognome = in.readLine();
 
-                data.addAll(new Dipendente(nome, cognome,""));
-
+                if(nome!=null &&cognome !=null) {
+                    data.addAll(new Dipendente(nome, cognome, ""));
+                }
             }
 
 

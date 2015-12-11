@@ -398,7 +398,7 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
             String nome=table.getItems().get(ix).getNome().toString();
             String cognome=table.getItems().get(ix).getCognome().toString();
 
-           lj.MySQL_GridView(Server.QUERY_ORDERDATE, nome, cognome);
+            lj.MySQL_GridView(Server.QUERY_ORDERDATE, nome, cognome);
 
 
             actionStatus.setText("Dipendente: " + dipendente.toString());
@@ -483,7 +483,7 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
             String nome=table.getItems().get(ix).getNome().toString();
             String cognome=table.getItems().get(ix).getCognome().toString();
 
-            lj.MySQL_GridView(Server.QUERY_ORDERDATE,nome, cognome);
+            lj.details(Server.QUERY_DETAILS,nome, cognome);
 
 
             actionStatus.setText("Dipendente: " + dipendente.toString());

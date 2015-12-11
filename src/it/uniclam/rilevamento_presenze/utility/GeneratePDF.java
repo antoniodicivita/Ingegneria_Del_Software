@@ -1,10 +1,11 @@
 package it.uniclam.rilevamento_presenze.utility;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.Socket;
 import java.sql.*;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -34,22 +35,26 @@ public class GeneratePDF {
 
 	public static void main(String[] args) {
         try {
-			OutputStream file = new FileOutputStream(new File("C:\\Users\\Chriz 7X\\Documents\\Test.pdf"));
-
+			//OutputStream file = new FileOutputStream(new File("C:\\Users\\Chriz 7X\\Documents\\Test.pdf"));
+            OutputStream file = new FileOutputStream(new File("C:\\Users\\Antonio Di Civita\\Documents\\Test.pdf"));
 			Document document = new Document();
 			PdfWriter.getInstance(document, file);
 
 			document.open();
 			document.add(new Paragraph("Report generato in automatico:"));
 			document.add(new Paragraph(new Date().toString()));
-            PdfPTable table = new PdfPTable(2);
-            PdfPCell cell = new PdfPCell(new Paragraph("Nome                                                      Cognome"));
-            cell.setColspan(4);
+            PdfPTable table = new PdfPTable(5);
+            PdfPCell cell = new PdfPCell(new Paragraph("Nome          Cognome            Evento             Data           Ora"));
+
+            cell.setColspan(5);
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
             cell.setBackgroundColor(BaseColor.GREEN);
             table.addCell(cell);
 
             /*******************************************/
+
+/*
+
             Connection connection = null;
             PreparedStatement ptmt= null;
             ResultSet resultSet = null;
@@ -61,9 +66,7 @@ public class GeneratePDF {
 
                 Statement st = connection.createStatement();
                 ResultSet res = st.executeQuery(queryString);
-          /* if (res.next()!=false){
-                System.out.println("ACCESSO VALIDO");
-*/
+
                 while (res.next()==true) {
 
                     table.addCell(res.getString("Nome"));
@@ -90,14 +93,18 @@ public class GeneratePDF {
                     e.printStackTrace();
                 }
 
-            }
+            }*/
 
         /**///////////////////////////////////*/
 
            // System.out.println(lj.genPDF(Server.QUERY_CREATE_PDF));
 
+            GregorianCalendar gcalendar = new GregorianCalendar();
+            int mese = gcalendar.get(Calendar.MONTH)+1;
+            int anno = gcalendar.get(Calendar.YEAR);
 
-           // document.add(table);
+            createReport(Server.QUERY_CREATE_MONTH_REPORT, mese, anno, table);
+            document.add(table);
 
             JOptionPane.showMessageDialog(null, "Report Salvato Con Successo!");
 			document.close();
@@ -109,4 +116,42 @@ public class GeneratePDF {
 			//e.printStackTrace();
 		}
 	}
+
+
+
+    public static void createReport(String type_query, int mese,int anno, PdfPTable table){
+
+
+        String req = type_query +"\n" + mese +"\n" + anno +"\n";
+        try {
+            Socket s = new Socket(Server.HOST, Server.PORT);
+            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            out.println(req);
+            String Nome=in.readLine();
+
+            if(Nome.equals("OK")){
+            while (Nome.length() > 0 ) {
+
+                Nome = in.readLine();
+                String Cognome = in.readLine();
+                String INOUT = in.readLine();
+                String Data = in.readLine();
+                String Ora = in.readLine();
+
+
+                table.addCell(Nome);
+                table.addCell(Cognome);
+                table.addCell(INOUT);
+                table.addCell(Data);
+                table.addCell(Ora);
+            }
+        }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+    }
 }
