@@ -197,10 +197,14 @@ public class FxTableUser
         srcbtn.setOnAction(new SearchButtonListener());
         Button okbtn=new Button("OK");
         okbtn.setOnAction(new OKButtonListener());
-        Button detailsbtn=new Button("Dettagli");
+        Button detailsbtn=new Button("Dettagli Eventi");
         detailsbtn.setOnAction(new DetailshButtonListener());
         Button backbtn=new Button("Annulla");
         backbtn.setOnAction(new SearchButtonListener());
+        Button discrepancybtn=new Button("Incongruenze");//InCONGRUENZE
+        discrepancybtn.setOnAction(new discrepancyButtonListener());
+        Button infobtn=new Button("Info Dipendenti");//InCONGRUENZE
+        infobtn.setOnAction(new infoEmployeeButtonListener());
 
         //Textbox
 
@@ -212,7 +216,7 @@ public class FxTableUser
 
 		buttonHb = new HBox(10);
 		buttonHb.setAlignment(Pos.CENTER);
-		buttonHb.getChildren().addAll(addbtn, delbtn,detailsbtn);
+		buttonHb.getChildren().addAll(addbtn, delbtn,detailsbtn,discrepancybtn,infobtn);
 
         buttonHbONE = new HBox(10);
         buttonHbONE.setAlignment(Pos.CENTER);
@@ -237,6 +241,7 @@ public class FxTableUser
 		Scene scene = new Scene(vbox, 500, 550); // w x h
 		primaryStage.setScene(scene);
 		primaryStage.show();
+        primaryStage.setMaximized(true);
 
 		// Select the first row
 		table.getSelectionModel().select(0);
@@ -419,6 +424,90 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
         }//Fine Handle()
     }//Fine search listner button
 
+//Incongruenze
+    private class discrepancyButtonListener implements EventHandler<ActionEvent> {
+        DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
+        @Override
+        public void handle(ActionEvent e) {
+
+
+// Get selected row and delete
+            int ix = table.getSelectionModel().getSelectedIndex();
+            Dipendente dipendente = (Dipendente) table.getSelectionModel().getSelectedItem();
+            System.out.println(table.getItems().get(ix).toString());
+
+            //System.out.println(table.getItems().get(ix).getTitle().toString());//Titolo X selezionato OK
+            //System.out.println(table.getItems().get(ix).getAuthor().toString());//Autore X selezionato OK
+            String nome=table.getItems().get(ix).getNome().toString();
+            String cognome=table.getItems().get(ix).getCognome().toString();
+
+            lj.MySQL_GridView(Server.QUERY_ORDERDATE,nome, cognome);
+
+
+            actionStatus.setText("Dipendente: " + dipendente.toString());
+
+            // Select a row
+
+            if (table.getItems().size() == 0) {
+
+                actionStatus.setText("Nessun record Trovato !");
+                return;
+            }
+
+            if (ix != 0) {
+
+                ix =ix;
+            }
+
+            table.requestFocus();
+            table.getSelectionModel().select(ix);
+            table.getFocusModel().focus(ix);
+
+/*************************/
+        }//Fine Handle()
+    }//Fine search listner button
+
+    private class infoEmployeeButtonListener implements EventHandler<ActionEvent> {
+        DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
+        @Override
+        public void handle(ActionEvent e) {
+
+
+// Get selected row and delete
+            int ix = table.getSelectionModel().getSelectedIndex();
+            Dipendente dipendente = (Dipendente) table.getSelectionModel().getSelectedItem();
+            System.out.println(table.getItems().get(ix).toString());
+
+            //System.out.println(table.getItems().get(ix).getTitle().toString());//Titolo X selezionato OK
+            //System.out.println(table.getItems().get(ix).getAuthor().toString());//Autore X selezionato OK
+            String nome=table.getItems().get(ix).getNome().toString();
+            String cognome=table.getItems().get(ix).getCognome().toString();
+
+            lj.MySQL_GridView(Server.QUERY_ORDERDATE,nome, cognome);
+
+
+            actionStatus.setText("Dipendente: " + dipendente.toString());
+
+            // Select a row
+
+            if (table.getItems().size() == 0) {
+
+                actionStatus.setText("Nessun record Trovato !");
+                return;
+            }
+
+            if (ix != 0) {
+
+                ix =ix;
+            }
+
+            table.requestFocus();
+            table.getSelectionModel().select(ix);
+            table.getFocusModel().focus(ix);
+
+/*************************/
+        }//Fine Handle()
+    }//Fine search listner button
 
 
 
