@@ -100,18 +100,7 @@ public class FxTableEvent
 		table.setItems(data);
 		table.setEditable(true);
 //Vedere QUI
-		TableColumn hourCol = new TableColumn("Ora");
-		hourCol.setCellValueFactory(new PropertyValueFactory<Event, String>("hour"));
-		hourCol.setCellFactory(TextFieldTableCell.forTableColumn());
-		hourCol.setOnEditCommit(new EventHandler<CellEditEvent<Event, String>>() {
-			@Override
-			public void handle(CellEditEvent<Event, String> t) {
 
-				((Event) t.getTableView().getItems().get(
-					t.getTablePosition().getRow())
-				).setHour(t.getNewValue());
-			}
-		});
 
         TableColumn dataCol = new TableColumn("Data");
         dataCol.setCellValueFactory(new PropertyValueFactory<Event, String>("data"));
@@ -125,6 +114,22 @@ public class FxTableEvent
                 ).setData(t.getNewValue());
             }
         });
+
+
+
+        TableColumn hourCol = new TableColumn("NOME");
+		hourCol.setCellValueFactory(new PropertyValueFactory<Event, String>("hour"));
+		hourCol.setCellFactory(TextFieldTableCell.forTableColumn());
+		hourCol.setOnEditCommit(new EventHandler<CellEditEvent<Event, String>>() {
+            @Override
+            public void handle(CellEditEvent<Event, String> t) {
+
+                ((Event) t.getTableView().getItems().get(
+                        t.getTablePosition().getRow())
+                ).setHour(t.getNewValue());
+            }
+        });
+
 
         TableColumn typeCol = new TableColumn("IN/OUT");
         typeCol.setCellValueFactory(new PropertyValueFactory<Event, String>("type_id"));
@@ -142,7 +147,7 @@ public class FxTableEvent
 
 
 
-        final TableColumn userCol = new TableColumn("ID");
+        final TableColumn userCol = new TableColumn("COGNOME");
         userCol.setCellValueFactory(new PropertyValueFactory<Event, String>("user_id"));
         userCol.setCellFactory(TextFieldTableCell.forTableColumn());
         userCol.setOnEditCommit(new EventHandler<CellEditEvent<Event, String>>() {
@@ -159,21 +164,20 @@ public class FxTableEvent
                 System.out.println(ix);
 
 
-
-                String nome=table.getItems().get(ix).getHour().toString();
-                String cognome=table.getItems().get(ix).getData().toString();
-                        String user_id=table.getItems().get(ix).getUser_id().toString();
-                String type_id=table.getItems().get(ix).getType_id().toString();
-               // System.out.println(autore+"tralalal");
+                String nome = table.getItems().get(ix).getHour().toString();
+                String cognome = table.getItems().get(ix).getData().toString();
+                String user_id = table.getItems().get(ix).getUser_id().toString();
+                String type_id = table.getItems().get(ix).getType_id().toString();
+                // System.out.println(autore+"tralalal");
                 //update
                 //QUERYlj.updateList(Server.QUERY_UPDATE_LIST, nome, cognome);
                 //Aggiorno il valore nel database FINE:
 
                 System.out.println("Ho modificato il valore di autori");
-			}
-		});
+            }
+        });
 //Dico le colonne quante sono
-		table.getColumns().setAll(userCol,dataCol,hourCol,typeCol);
+		table.getColumns().setAll(userCol, hourCol,dataCol, typeCol);
 		table.setPrefWidth(450);
 		table.setPrefHeight(300);
 		table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -212,11 +216,11 @@ public class FxTableEvent
 
 		buttonHb = new HBox(10);
 		buttonHb.setAlignment(Pos.CENTER);
-		buttonHb.getChildren().addAll(addbtn, delbtn,detailsbtn);
+		buttonHb.getChildren().addAll(addbtn, delbtn, detailsbtn);
 
         buttonHbONE = new HBox(10);
         buttonHbONE.setAlignment(Pos.CENTER);
-        buttonHbONE.getChildren().addAll(LabelSearch, TextboxSearch,srcbtn);
+        buttonHbONE.getChildren().addAll(LabelSearch, TextboxSearch, srcbtn);
 
 
         buttonHbTWO = new HBox(10);

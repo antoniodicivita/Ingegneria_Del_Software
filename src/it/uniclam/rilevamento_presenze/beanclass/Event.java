@@ -62,6 +62,6 @@ public class Event {
     @Override
     public String toString() {
 
-        return (user_id.get()+" "+data.get() + " " + hour.get()+" "+type_id.get());
+        return ("IL DIPENDENTE: "+user_id.get()+" "+ hour.get() + "IN DATA" +data.get()+"HA EFFETTUATO UN "+type_id.get());
     }
 }
