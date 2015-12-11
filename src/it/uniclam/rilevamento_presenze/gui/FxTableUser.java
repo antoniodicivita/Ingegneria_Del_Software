@@ -99,7 +99,7 @@ public class FxTableUser
 		titleCol.setOnEditCommit(new EventHandler<CellEditEvent<Dipendente, String>>() {
 			@Override
 			public void handle(CellEditEvent<Dipendente, String> t) {
-
+                DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
 				((Dipendente) t.getTableView().getItems().get(
 					t.getTablePosition().getRow())
 				).setCognome(t.getNewValue());
@@ -111,7 +111,7 @@ public class FxTableUser
                 String nome=table.getItems().get(ix).getNome().toString();
                 String cognome=table.getItems().get(ix).getCognome().toString();
                 String id_employee=table.getItems().get(ix).getId_employee().toString();
-                update(cognome,nome,id_employee);
+                lj.update(Server.QUERY_UPDATE_LIST,cognome, nome, id_employee);
                 System.out.println("Ho modificato il valore di COL 1");
 
 
@@ -143,7 +143,7 @@ public class FxTableUser
                 //update
                // lj.updateList(Server.QUERY_UPDATE_LIST, nome, cognome);
                 //Aggiorno il valore nel database FINE:
-                update(cognome,nome,id_employee);
+                lj.update(Server.QUERY_UPDATE_LIST,cognome, nome, id_employee);
                 System.out.println("Ho modificato il valore di COL 2");
 			}
 		});
@@ -155,8 +155,10 @@ public class FxTableUser
         employeeCol.setCellFactory(TextFieldTableCell.forTableColumn());
         employeeCol.setOnEditCommit(new EventHandler<CellEditEvent<Dipendente, String>>() {
             @Override
+
             public void handle(CellEditEvent<Dipendente, String> t) {
 
+                DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
                 ((Dipendente) t.getTableView().getItems().get(
                         t.getTablePosition().getRow())
                 ).setId_employee(t.getNewValue());
@@ -168,7 +170,7 @@ public class FxTableUser
                 String nome=table.getItems().get(ix).getNome().toString();
                 String cognome=table.getItems().get(ix).getCognome().toString();
                 String id_employee=table.getItems().get(ix).getId_employee().toString();
-                update(cognome,nome,id_employee);
+                lj.update(Server.QUERY_UPDATE_LIST,cognome, nome, id_employee);
                 System.out.println("Ho modificato il valore di COL 1");
 
 
@@ -391,7 +393,7 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
             String nome=table.getItems().get(ix).getNome().toString();
             String cognome=table.getItems().get(ix).getCognome().toString();
 
-           lj.MySQL_GridView(Server.QUERY_ORDERDATE,nome, cognome);
+           lj.MySQL_GridView(Server.QUERY_ORDERDATE, nome, cognome);
 
 
             actionStatus.setText("Dipendente: " + dipendente.toString());
@@ -422,12 +424,14 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
 
 
     //TEMP
-    public void update(String stringa1,String stringa2,String stringa3) {
+
+    /*
+    public void update(String stringa1,String stringa2,String id) {
         Connection connection = null;
         PreparedStatement ptmt = null,ptmt2 = null;
         ResultSet resultSet = null;
         try {
-            String queryString = "UPDATE user SET Cognome=?,Nome=? WHERE ID_User='"+stringa3+"'";
+            String queryString = "UPDATE user SET Cognome=?,Nome=? WHERE ID_User='"+id+"'";
             connection = getConnection();
             ptmt = connection.prepareStatement(queryString);
             ptmt.setString(1, stringa1);
@@ -453,7 +457,7 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
 
             }
         }
-    }
+    }*/
 
 
 }

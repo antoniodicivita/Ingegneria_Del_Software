@@ -6,6 +6,7 @@ package it.uniclam.rilevamento_presenze.gui;
 //import it.uniclam.rilevamento_presenze.JDBCDataAccessObject.UtenteJDBCDAO;
 //import it.uniclam.rilevamento_presenze.beanclass.UtenteBean;
 import it.uniclam.rilevamento_presenze.connections.Server;
+import it.uniclam.rilevamento_presenze.jdbcdao.Sensore;
 import it.uniclam.rilevamento_presenze.utility.Time;
 import it.uniclam.rilevamento_presenze.jdbcdao.DipendenteJDBCDAO;
 
@@ -26,6 +27,7 @@ public class BadgeGUI extends JFrame implements ActionListener {
 
     boolean state_TrueFalse;
     int Return_ID_User;
+
     int Count;
 
     JPanel panel;
@@ -142,32 +144,37 @@ public class BadgeGUI extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
 
-
-
         DipendenteJDBCDAO amicoDB=new DipendenteJDBCDAO();
+        Sensore sensore = new Sensore();
         //UtenteBean amicoClass=new UtenteBean();
         //EventJDBCDAO eventDB=new EventJDBCDAO();
 
         Time time = new Time();
 
         int type_event=0;
+
+
+        //Return_ID_User=amicoDB.SELECT_NameSurname(TextBoxNome.getText(), TextBoxCognome.getText(), TextBoxCodice.getText());
+        Return_ID_User = sensore.SELECT_NameSurname(Server.QUERY_RETURN_ID,TextBoxNome.getText(), TextBoxCognome.getText(), TextBoxCodice.getText());
+        //String id =TextBoxCodice.getText();
+        //Return_ID_User = Integer.parseInt(id);
+//        Return_ID_User =Sensore.SELECT_NameSurname(Server.QUERY_RETURN_ID,TextBoxNome.getText(), TextBoxCognome.getText(), TextBoxCodice.getText());
+
         if (e.getSource()==ButtonBADGE_IN){
 
             type_event=1;
 
-            Return_ID_User=amicoDB.SELECT_NameSurname(TextBoxNome.getText(), TextBoxCognome.getText(), TextBoxCodice.getText());
 
 
                 if (Return_ID_User != 0) {
 
-                    int countevent_IN_OUT = countItem(Server.QUERY_COUNT_ITEM, Return_ID_User, time.getDate());
-
+                    int countevent_IN_OUT = sensore.countItem(Server.QUERY_COUNT_ITEM, Return_ID_User, time.getDate());
 
                     if (countevent_IN_OUT < 2) {
 
-                        addEvent(Server.QUERY_IN_OUT, time.getHour(), time.getDate(), type_event);
+                        Sensore.addEvent(Server.QUERY_IN_OUT, Return_ID_User, time.getHour(), time.getDate(), type_event);
 
-                        orderByDate(Server.QUERY_ORDERDATE, Return_ID_User);
+
 
                     } else {
                         JOptionPane.showMessageDialog(this,
@@ -182,7 +189,7 @@ public class BadgeGUI extends JFrame implements ActionListener {
 
                 } else {
                     //System.out.println("False");
-                    //System.out.println(Return_ID_User);
+                    System.out.println(Return_ID_User);
                 }
 
         }
@@ -190,17 +197,16 @@ public class BadgeGUI extends JFrame implements ActionListener {
         else if (e.getSource()==ButtonBADGE_OUT){
 
             type_event = 2;
+          //  Return_ID_User = Sensore.SELECT_NameSurname(Server.QUERY_RETURN_ID,TextBoxNome.getText(), TextBoxCognome.getText(), TextBoxCodice.getText());
 
             if (Return_ID_User!=0) {
 
-                int countevent_IN_OUT = countItem(Server.QUERY_COUNT_ITEM, Return_ID_User, time.getDate());
+                int countevent_IN_OUT = Sensore.countItem(Server.QUERY_COUNT_ITEM, Return_ID_User, time.getDate());
 
 
                 if (countevent_IN_OUT < 2) {
 
-                    addEvent(Server.QUERY_IN_OUT, time.getHour(), time.getDate(), type_event);
-
-                    orderByDate(Server.QUERY_ORDERDATE, Return_ID_User);
+                    Sensore.addEvent(Server.QUERY_IN_OUT,Return_ID_User, time.getHour(), time.getDate(), type_event);
 
                 } else {
                     System.out.println("Dipendente non INSERITO nel DB");
@@ -211,7 +217,6 @@ public class BadgeGUI extends JFrame implements ActionListener {
                     TextBoxNome.setText(" ");
                     TextBoxCognome.setText(" ");
                     TextBoxCodice.setText(" ");
-
 
 
             }else {
@@ -250,82 +255,7 @@ public class BadgeGUI extends JFrame implements ActionListener {
 
     }
 
-    public void addEvent(String type_query, String hour, String date, int type_event){
 
-        String req= type_query +"\n" + Return_ID_User + "\n" + hour + "\n"+ date+ "\n"+ type_event + "\n";
-
-        try {
-            Socket s = new Socket(Server.HOST, Server.PORT);
-
-            PrintWriter out =new PrintWriter(s.getOutputStream(),true);
-            BufferedReader in= new BufferedReader(new InputStreamReader(s.getInputStream()));
-            out.println(req);
-            String line=in.readLine();
-
-            System.out.println(line);
-            s.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public int countItem(String type_query, int id, String date){
-
-        int count = 0;
-
-        String req = type_query +"\n" + id + "\n" + date+ "\n";
-        try {
-            Socket s = new Socket(Server.HOST, Server.PORT);
-
-            PrintWriter out =new PrintWriter(s.getOutputStream(),true);
-            BufferedReader in= new BufferedReader(new InputStreamReader(s.getInputStream()));
-            out.println(req);
-            String line=in.readLine();
-
-            count = Integer.parseInt(line);
-
-
-            s.close();
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return count;
-
-    }
-
-
-    public void orderByDate(String type_query, int id){
-
-        String req = type_query +"\n" + id + "\n";
-
-
-        try {
-            Socket s = new Socket(Server.HOST, Server.PORT);
-
-            PrintWriter out =new PrintWriter(s.getOutputStream(),true);
-            BufferedReader in= new BufferedReader(new InputStreamReader(s.getInputStream()));
-            out.println(req);
-
-            String line=in.readLine();
-
-            while(line.length()>0){
-                System.out.println(line);
-                line=in.readLine();
-            }
-
-
-            s.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-    }
 
 }
 

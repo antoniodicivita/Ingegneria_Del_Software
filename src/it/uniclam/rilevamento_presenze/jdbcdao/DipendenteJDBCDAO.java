@@ -104,11 +104,12 @@ public class DipendenteJDBCDAO {
 
                     nome = in.readLine();
                     String cognome = in.readLine();
-                    list.add(new Dipendente(nome, cognome,"10"));
+                    String id = in.readLine();
+                    list.add(new Dipendente(nome, cognome,id));
 
 
 
-                    System.out.println("STAMPA: "+nome+ " e: "+ cognome);
+                    System.out.println("STAMPA: " + nome + " e: " + cognome);
                 }
 
 
@@ -184,10 +185,10 @@ public class DipendenteJDBCDAO {
 
 
 
-    public void updateList(String type_query,String nome,String cognome) {
+    public void update(String type_query,String nome,String cognome, String id) {
 
         //String req = "UPDATE user SET Cognome='"+valueTWO+"' WHERE Nome='"+valueONE+"'AND Cognome'"+valueTWO+"'";
-        String req = type_query +"\n" + nome+"\n" + cognome+"\n";
+        String req = type_query +"\n" + nome+"\n" + cognome+"\n" + id + "\n";
 
         try {
             Socket s = new Socket(Server.HOST, Server.PORT);

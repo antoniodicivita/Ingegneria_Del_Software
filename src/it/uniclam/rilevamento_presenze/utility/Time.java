@@ -21,10 +21,11 @@ public class Time {
         this.months = new String[]{
                 "Jan", "Feb", "Mar", "Apr",
                 "May", "Jun", "Jul", "Aug",
+
                 "Sep", "Oct", "Nov", "Dec"};
         this.setHour(gcalendar.get(java.util.Calendar.HOUR_OF_DAY) + ":" + gcalendar.get(java.util.Calendar.MINUTE) + ":" + gcalendar.get(java.util.Calendar.SECOND));
         this.setDate(gcalendar.get(java.util.Calendar.DATE) + " " + months[gcalendar.get(java.util.Calendar.MONTH)] + " " + gcalendar.get(java.util.Calendar.YEAR));
-    }
+}
 
     public String getHour() {
         return hour;
