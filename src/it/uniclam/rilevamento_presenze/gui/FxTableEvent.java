@@ -1,5 +1,6 @@
 package it.uniclam.rilevamento_presenze.gui;
 
+import it.uniclam.rilevamento_presenze.beanclass.Dipendente;
 import it.uniclam.rilevamento_presenze.beanclass.Event;
 import it.uniclam.rilevamento_presenze.connections.ConnectionDB;
 import it.uniclam.rilevamento_presenze.connections.Server;
@@ -152,9 +153,28 @@ public class FxTableEvent
             @Override
             public void handle(CellEditEvent<Event, String> t) {
 
-                ((Event) t.getTableView().getItems().get(
-                        t.getTablePosition().getRow())
-                ).setType_id(t.getNewValue());
+                EventJDBCDAO lj = new EventJDBCDAO();
+                        ((Event) t.getTableView().getItems().get(
+                                        t.getTablePosition().getRow())
+                        ).setType_id(t.getNewValue());
+
+                //Aggiorno il valore nel database INIZIO:
+                int ix = table.getSelectionModel().getSelectedIndex();
+                Event event = (Event) table.getSelectionModel().getSelectedItem();
+                System.out.println(ix);
+
+
+
+                //String nome=table.getItems().get(ix).getNome().toString();
+                //String cognome=table.getItems().get(ix).getCognome().toString();
+                String id_event=table.getItems().get(ix).getType_id().toString();
+
+                // System.out.println(autore+"tralalal");
+                //update
+                // lj.updateList(Server.QUERY_UPDATE_LIST, nome, cognome);
+                //Aggiorno il valore nel database FINE:
+                //lj.update(Server.QUERY_UPDATE_LIST, id_event);
+                System.out.println("Ho modificato il valore di COL 2");
             }
         });
 
@@ -353,7 +373,7 @@ if (ix < data.size()) {
                 String type_id= res.getString("Name_Type");
                 list.add(new Event(user_id,data,ora,type_id));
 
-
+//cognome, data, nome, nametype
 
             }
 
@@ -479,8 +499,14 @@ EventJDBCDAO lj=new EventJDBCDAO();
 //Elimino tutti gli elementi dalla tabella ( NON dal database)
             /*************************/
             table.getItems().clear();
-            String value=TextboxSearch.getText();
+            datainiziale=dataInizialeTextBox.getValue().toString();
+            datafinale = dataFinaleTextBox.getValue().toString();
 
+            //data = EventJDBCDAO.searchDate(Server.QUERY_DATE_SEARCH, datainiziale, datafinale);
+            //  EventJDBCDAO.call(table, data);
+            data = lj.searchDate(Server.QUERY_DATE_SEARCH, datainiziale, datafinale);
+            table.setItems(data);
+            lj.call(table, data);
           //  lj.searchList(Server.QUERY_SEARCH_LIST,value,data);
 
 
@@ -503,40 +529,7 @@ EventJDBCDAO lj=new EventJDBCDAO();
             //EventJDBCDAO.call(table, data);
 
 
-            datainiziale=dataInizialeTextBox.getValue().toString();
-            datafinale = dataFinaleTextBox.getValue().toString();
 
-            //data = EventJDBCDAO.searchDate(Server.QUERY_DATE_SEARCH, datainiziale, datafinale);
-          //  EventJDBCDAO.call(table, data);
-            data = lj.searchDate(Server.QUERY_DATE_SEARCH, datainiziale, datafinale);
-            table.setItems(data);
-            //lj.call(table, data);
-            int lenght = table.getItems().size();//Numero elementi nella tabella
-            int i=0;
-System.out.println(lenght);
-            table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            table.requestFocus();
-            while (i<lenght-1) {
-                if (Objects.equals(table.getItems().get(i).getUser_id().toString(), table.getItems().get(i + 1).getUser_id().toString()) &&
-                        Objects.equals(table.getItems().get(i).getData().toString(), table.getItems().get(i + 1).getData().toString()) &&
-                        Objects.equals(table.getItems().get(i).getType_id().toString(), table.getItems().get(i + 1).getType_id().toString())) {
-
-
-                    table.getSelectionModel().select(data.get(i));
-                    table.getSelectionModel().select(data.get(i + 1));
-
-
-                    table.getSelectionModel().focus(4);
-
-
-
-                    //table.getItems().
-                    //  System.out.println("I:"+i+" J:"+ j +"DataA: "+table.getItems().get(i).getUser_id().toString() +"DataB: "+table.getItems().get(i).getData().toString()+" + "+ table.getItems().get(j).getUser_id().toString()+" "+table.getItems().get(j).getData().toString());
-                }
-                i++;
-
-
-            }
 
 
 

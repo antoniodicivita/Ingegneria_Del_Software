@@ -205,10 +205,10 @@ public class EventJDBCDAO {Connection connection = null;
 
     }
 
-    public void update(String type_query, String id) {
+    public void update(String type_query, String name_type, String id_event) {
 
         //String req = "UPDATE user SET Cognome='"+valueTWO+"' WHERE Nome='"+valueONE+"'AND Cognome'"+valueTWO+"'";
-        String req = type_query +"\n"  + id + "\n";
+        String req = type_query +"\n" + name_type + "\n" + id_event + "\n";
 
         try {
             Socket s = new Socket(Server.HOST, Server.PORT);
@@ -344,7 +344,9 @@ public class EventJDBCDAO {Connection connection = null;
                     String Data = in.readLine();
                    // String Ora = in.readLine();
 
-                    list.add(new Event(nome,Cognome,INOUT,Data));
+                    if(nome !=null && Cognome!=null && INOUT!=null && Data!=null){
+                    list.add(new Event(Cognome,INOUT, nome, Data));}
+                    //cognome, data, nome, nametype
                     //rowData[count] = new Object[]{nome, Cognome, INOUT, Data, Ora};
 
                     //count++;

@@ -112,7 +112,7 @@ public class Server {
                         String datainiziale = in.readLine();
                         String datafinale = in.readLine();
 
-                        String query = "SELECT Nome, Cognome, Name_Type, Data FROM (event JOIN type ON Type_ID = ID_Type) JOIN user ON User_ID=ID_User WHERE (str_to_date(Data, '%d%b%Y')) >= '" + datainiziale + "' AND (str_to_date(Data, '%d%b%Y')) <= '" + datafinale+"' ORDER BY  (str_to_date(Data, '%d%b%Y')) DESC, User_ID";
+                        String query = "SELECT Cognome, Nome, Data, Name_Type FROM (event JOIN type ON Type_ID = ID_Type) JOIN user ON User_ID=ID_User WHERE (str_to_date(Data, '%d%b%Y')) >= '" + datainiziale + "' AND (str_to_date(Data, '%d%b%Y')) <= '" + datafinale+"' ORDER BY  (str_to_date(Data, '%d%b%Y')) DESC, User_ID";
                         String out = searchDate(query);
 
 
@@ -179,8 +179,8 @@ public class Server {
 
                        // String event = in.readLine().replace("event", "");
                         String id_event = in.readLine();
-                        String id = in.readLine().replace("id", "");
-                        String query = "UPDATE event SET  Type_ID='"+id_event+"' WHERE ID_User='"+id+"'";
+                        String name_type = in.readLine().replace("id", "");
+                        String query = "UPDATE type SET  Name_Type='"+name_type+"' WHERE ID_User='"+id_event+"'";
                         String out = standardQueryExecutor(query);
                         outchannel.println(out);
                         s.close();
@@ -576,10 +576,11 @@ public class Server {
             out += rowcount+"\n";
             while (res.next()==true) {
 
-                out += res.getString("Nome")+ "\n";
                 out += res.getString("Cognome")+ "\n";
-                out += res.getString("Name_Type")+ "\n";
+                out += res.getString("Nome")+ "\n";
                 out += res.getString("Data")+ "\n";
+                out += res.getString("Name_Type")+ "\n";
+
                 //out += res.getString("Hour")+ "\n";
 
 
