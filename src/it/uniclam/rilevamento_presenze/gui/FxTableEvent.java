@@ -503,8 +503,8 @@ EventJDBCDAO lj=new EventJDBCDAO();
             EventJDBCDAO.call(table, data);
 
 
-//            datainiziale=dataInizialeTextBox.getValue().toString();
-  //          datafinale = dataFinaleTextBox.getValue().toString();
+            datainiziale=dataInizialeTextBox.getValue().toString();
+            datafinale = dataFinaleTextBox.getValue().toString();
 
             EventJDBCDAO.searchDate(Server.QUERY_DATE_SEARCH, datainiziale, datafinale);
 
