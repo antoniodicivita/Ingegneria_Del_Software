@@ -9,7 +9,7 @@ public class ConnectionDB {
 	String connectionUrl = "jdbc:mysql://localhost:3306/";
     String dbName = "movedb";
 	String dbUser = "root";
-	String dbPwd = "juventus";
+	String dbPwd = "";
 
 	private static ConnectionDB connectionFactory = null;
 

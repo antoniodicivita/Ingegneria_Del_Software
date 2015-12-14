@@ -317,8 +317,7 @@ public class EventJDBCDAO {Connection connection = null;
 
         JFrame frame = new JFrame("Dettagli Eventi");
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        String columnNames[] = { "NOME", "COGNOME", "IN/OUT","DATA","ORA" };
-        // String req =  type_query +"\n" + nome+"\n" + cognome+"\n";
+
 
         List list = new ArrayList();
         int count = 0;
@@ -342,10 +341,11 @@ public class EventJDBCDAO {Connection connection = null;
                     String Cognome = in.readLine();
                     String INOUT = in.readLine();
                     String Data = in.readLine();
+                    String id_event=in.readLine();
                    // String Ora = in.readLine();
 
                     if(nome !=null && Cognome!=null && INOUT!=null && Data!=null){
-                    list.add(new Event(Cognome,INOUT, nome, Data));}
+                    list.add(new Event(Cognome,INOUT, nome, Data,id_event));}
                     //cognome, data, nome, nametype
                     //rowData[count] = new Object[]{nome, Cognome, INOUT, Data, Ora};
 

@@ -156,24 +156,28 @@ public class FxTableEvent
                 EventJDBCDAO lj = new EventJDBCDAO();
                         ((Event) t.getTableView().getItems().get(
                                         t.getTablePosition().getRow())
-                        ).setType_id(t.getNewValue());
+                        ).setEvent_id(t.getNewValue());
 
                 //Aggiorno il valore nel database INIZIO:
-                int ix = table.getSelectionModel().getSelectedIndex();
+                int ix = table.getSelectionModel().getFocusedIndex();
                 Event event = (Event) table.getSelectionModel().getSelectedItem();
                 System.out.println(ix);
 
 
 
                 //String nome=table.getItems().get(ix).getNome().toString();
-                //String cognome=table.getItems().get(ix).getCognome().toString();
-                String id_event=table.getItems().get(ix).getType_id().toString();
+                String name_type=table.getItems().get(ix).getType_id().toString();
+               // String name_type=table.getSelectionModel().ge;
+                System.out.println(name_type);
+                if(Objects.equals(name_type,"INGRESSO")){name_type="1";}
+                else {name_type="2";}
+                String id_event=table.getSelectionModel().getSelectedItem().getEvent_id();
 
                 // System.out.println(autore+"tralalal");
                 //update
                 // lj.updateList(Server.QUERY_UPDATE_LIST, nome, cognome);
                 //Aggiorno il valore nel database FINE:
-                //lj.update(Server.QUERY_UPDATE_LIST, id_event);
+                lj.update(Server.QUERY_UPDATE_LIST, name_type,id_event);
                 System.out.println("Ho modificato il valore di COL 2");
             }
         });
@@ -181,7 +185,7 @@ public class FxTableEvent
 
 
 
-        final TableColumn userCol = new TableColumn("COGNOME");
+         TableColumn userCol = new TableColumn("COGNOME");
         userCol.setCellValueFactory(new PropertyValueFactory<Event, String>("user_id"));
         userCol.setCellFactory(TextFieldTableCell.forTableColumn());
         userCol.setOnEditCommit(new EventHandler<CellEditEvent<Event, String>>() {
@@ -210,8 +214,37 @@ public class FxTableEvent
                 System.out.println("Ho modificato il valore di autori");
             }
         });
+
+        final TableColumn event_idCol = new TableColumn("ID");
+        event_idCol.setCellValueFactory(new PropertyValueFactory<Dipendente, String>("event_id"));
+        event_idCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        event_idCol.setOnEditCommit(new EventHandler<CellEditEvent<Event, String>>() {
+            @Override
+
+            public void handle(CellEditEvent<Event, String> t) {
+
+                EventJDBCDAO lj=new EventJDBCDAO();
+                ((Event) t.getTableView().getItems().get(
+                        t.getTablePosition().getRow())
+                ).setEvent_id(t.getNewValue());
+
+                //Modifica dei campi quando faccio invio (COLONNA 1)
+                int ix = table.getSelectionModel().getSelectedIndex();
+                Event event = (Event) table.getSelectionModel().getSelectedItem();
+                System.out.println(ix);
+                /*String nome=table.getItems().get(ix).getNome().toString();
+                String cognome=table.getItems().get(ix).getCognome().toString();
+                String id_employee=table.getItems().get(ix).getId_employee().toString();
+                lj.update(Server.QUERY_UPDATE_LIST,cognome, nome, id_employee);
+                System.out.println("Ho modificato il valore di COL 1");*/
+
+
+            }
+        });
+
+
 //Dico le colonne quante sono
-		table.getColumns().setAll(userCol, hourCol,dataCol, typeCol);
+		table.getColumns().setAll(userCol, hourCol,dataCol, typeCol,event_idCol);
 		table.setPrefWidth(450);
 		table.setPrefHeight(300);
 		table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -333,15 +366,10 @@ public class FxTableEvent
 
 if (ix < data.size()) {
 
-    if (!table.getSelectionModel().isEmpty()){
-
-        EventJDBCDAO.call(table, data);
-        //table.getSelectionModel().clearSelection(0);NI
-
-
-    }
+    if (!table.getSelectionModel().isEmpty()){EventJDBCDAO.call(table, data); }
     else {EventJDBCDAO.call(table, data);}
 }
+
 
             /****/
 		}
@@ -358,7 +386,7 @@ if (ix < data.size()) {
         System.out.println("Sono passato da fuori");
 
         try {
-            String queryString = "SELECT event.Data, Nome, Cognome, Name_Type FROM (event  JOIN user ON User_ID=ID_User) JOIN type ON Type_ID=ID_Type  ORDER BY STR_TO_DATE(Data, '%d%b%Y') DESC, User_ID";
+            String queryString = "SELECT event.Data, Nome, Cognome, Name_Type,ID_Event FROM (event  JOIN user ON User_ID=ID_User) JOIN type ON Type_ID=ID_Type  ORDER BY STR_TO_DATE(Data, '%d%b%Y') DESC, User_ID";
             connection = getConnection();
 
             Statement st = connection.createStatement();
@@ -368,10 +396,10 @@ if (ix < data.size()) {
 
                 String ora=res.getString("Nome");
                 String data= res.getString("Data");
-               String user_id=res.getString("Cognome");
-                //Integer user_id=res.getInt(4);
+                String user_id=res.getString("Cognome");
                 String type_id= res.getString("Name_Type");
-                list.add(new Event(user_id,data,ora,type_id));
+                String event_id=res.getString("ID_Event");
+                list.add(new Event(user_id,data,ora,type_id,event_id));
 
 //cognome, data, nome, nametype
 

@@ -11,16 +11,18 @@ public class Event {
     private SimpleStringProperty data;//COgnome=Data
     private SimpleStringProperty user_id;
     private SimpleStringProperty type_id;
+    private SimpleStringProperty event_id;
 
     public Event() {
     }
 
-    public Event(String s1, String s2,String s3,String s4) {
+    public Event(String s1, String s2,String s3,String s4,String s5) {
 
         hour = new SimpleStringProperty(s3);
         data = new SimpleStringProperty(s2);
         user_id = new SimpleStringProperty(s1);
         type_id = new SimpleStringProperty(s4);
+        event_id=new SimpleStringProperty(s5);
     }
 
     public String getHour() {
@@ -57,6 +59,15 @@ public class Event {
     public void setUser_id(String s) {
 
         user_id.set(s);
+    }
+
+    public String getEvent_id() {
+
+        return event_id.get();
+    }
+    public void setEvent_id(String s) {
+
+        event_id.set(s);
     }
 
     @Override
