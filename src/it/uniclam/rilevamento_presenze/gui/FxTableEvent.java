@@ -500,15 +500,16 @@ EventJDBCDAO lj=new EventJDBCDAO();
 
 //            String stringa = table.getItems().get(4).getUser_id().toString();
 
-            EventJDBCDAO.call(table, data);
+            //EventJDBCDAO.call(table, data);
 
 
             datainiziale=dataInizialeTextBox.getValue().toString();
             datafinale = dataFinaleTextBox.getValue().toString();
 
-            EventJDBCDAO.searchDate(Server.QUERY_DATE_SEARCH, datainiziale, datafinale);
-
-
+            //data = EventJDBCDAO.searchDate(Server.QUERY_DATE_SEARCH, datainiziale, datafinale);
+          //  EventJDBCDAO.call(table, data);
+            data = lj.searchDate(Server.QUERY_DATE_SEARCH, datainiziale, datafinale);
+            
 /*************************/
         }//Fine Handle()
     }//Fine search listner button

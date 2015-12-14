@@ -256,7 +256,7 @@ public class EventJDBCDAO {Connection connection = null;
         }
 
     }
-
+/*
 
     public static  void searchDate(String type_query,String datainiziale, String datafinale){
 
@@ -308,6 +308,62 @@ public class EventJDBCDAO {Connection connection = null;
         }
 
 
+    }
+
+*/
+    public static  ObservableList searchDate(String type_query,String datainiziale, String datafinale){
+
+        String req = type_query +"\n" + datainiziale+"\n" + datafinale +"\n";
+
+        JFrame frame = new JFrame("Dettagli Eventi");
+        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        String columnNames[] = { "NOME", "COGNOME", "IN/OUT","DATA","ORA" };
+        // String req =  type_query +"\n" + nome+"\n" + cognome+"\n";
+
+        List list = new ArrayList();
+        int count = 0;
+
+        try {
+            Socket s = new Socket(Server.HOST, Server.PORT);
+            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            out.println(req);
+
+            String nome=in.readLine();
+            if(nome.equals("OK")) {
+                nome = in.readLine();
+                int countrow = Integer.parseInt(nome);
+                //Object rowData[][] = new Object[countrow][];
+
+
+                while (nome.length() > 0 && count < countrow) {
+
+                    nome = in.readLine();
+                    String Cognome = in.readLine();
+                    String INOUT = in.readLine();
+                    String Data = in.readLine();
+                   // String Ora = in.readLine();
+
+                    list.add(new Event(nome,Cognome,INOUT,Data));
+                    //rowData[count] = new Object[]{nome, Cognome, INOUT, Data, Ora};
+
+                    //count++;
+                }
+
+                /*
+
+                JTable table = new JTable(rowData, columnNames);
+                JScrollPane scrollPane = new JScrollPane(table);
+                frame.add(scrollPane, BorderLayout.CENTER);
+                frame.pack();//frame.setSize(AUTO)
+                frame.setVisible(true);*/
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+       ObservableList data = FXCollections.observableList(list);
+        return  data;
     }
 
     public int SELECT_NameSurname(String name,String surname,String id_user) {
