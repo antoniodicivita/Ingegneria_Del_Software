@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -20,6 +21,7 @@ import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -27,11 +29,15 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 import java.awt.color.ColorSpace;
 import java.io.IOException;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.Date;
 
 
 public class FxTableEvent
@@ -56,11 +62,18 @@ public class FxTableEvent
     }
     /*FINE Conn DB*/
 
-    public FxTableEvent(){}
+    public FxTableEvent(){
+        this.dataInizialeTextBox = new DatePicker();
+        this.dataFinaleTextBox = new DatePicker();
+    }
     private TableView<Event> table;
 	private ObservableList<Event> data;
 	private Text actionStatus;
-
+    public final String pattern = "yyyy-MM-dd";
+    public String datainiziale = "";
+    public String datafinale = "";
+    public DatePicker dataInizialeTextBox;
+    public DatePicker dataFinaleTextBox;
 	public static void main(String [] args) {
 
 		Application.launch(args);
@@ -84,6 +97,7 @@ public class FxTableEvent
 		primaryStage.setTitle("Pannello di Controllo:Responsabile Presenze");
        // initRootLayout();
 		// Users label
+
 		Label label = new Label("INCONGRUENZE");
         LabelSearch=new Label("CERCA");
         LabelSearch.setTextFill(Color.YELLOWGREEN);
@@ -206,6 +220,41 @@ public class FxTableEvent
         Button backbtn=new Button("Annulla");
         backbtn.setOnAction(new SearchButtonListener());
 
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        //DatePicker dataInizialeTextBox = new DatePicker();
+
+        GridPane gridPane = new GridPane();
+
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+
+        Label dataIniziale = new Label("Data iniziale");
+        gridPane.add(dataIniziale, 0, 0);
+
+        GridPane.setHalignment(dataIniziale, HPos.CENTER);
+        gridPane.add(dataInizialeTextBox, 0,1);
+
+        setCalendar(dataInizialeTextBox);
+
+
+//        DatePicker dataFinaleTextBox = new DatePicker();
+
+        Label dataFinale = new Label("Data Finale");
+        gridPane.add(dataFinale, 10,0);
+        //gridPane2.setGridLinesVisible(true);
+        GridPane.setHalignment(dataFinale, HPos.CENTER);
+        gridPane.add(dataFinaleTextBox, 10, 1);
+
+        setCalendar(dataFinaleTextBox);
+
+        datainiziale = dataInizialeTextBox.getAccessibleText();
+        datafinale = dataFinaleTextBox.toString();
+
+
+        //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
         //Textbox
 
         TextboxSearch=new TextField();
@@ -220,8 +269,8 @@ public class FxTableEvent
 
         buttonHbONE = new HBox(10);
         buttonHbONE.setAlignment(Pos.CENTER);
-        buttonHbONE.getChildren().addAll(LabelSearch, TextboxSearch, srcbtn);
-
+       // buttonHbONE.getChildren().addAll(LabelSearch, TextboxSearch, srcbtn);
+        buttonHbONE.getChildren().addAll(srcbtn);
 
         buttonHbTWO = new HBox(10);
         buttonHbTWO.setAlignment(Pos.CENTER);
@@ -235,8 +284,8 @@ public class FxTableEvent
 		// Vbox
 		VBox vbox = new VBox(20);
 		vbox.setPadding(new Insets(25, 25, 25, 25));;
-		vbox.getChildren().addAll(labelHb,buttonHbONE,table, buttonHb,buttonHbTWO,TextboxInsertPK,actionStatus);
-
+		//vbox.getChildren().addAll(labelHb,buttonHbONE,table, buttonHb,buttonHbTWO,TextboxInsertPK,actionStatus,gridPane);
+        vbox.getChildren().addAll(labelHb,gridPane,buttonHbONE,table, buttonHb,buttonHbTWO,TextboxInsertPK,actionStatus);
 		// Scene
 		Scene scene = new Scene(vbox, 500, 550); // w x h
         table.getStylesheets().add(getClass().getResource("table.css").toExternalForm());
@@ -266,12 +315,12 @@ if (ix < data.size()) {
 
     if (!table.getSelectionModel().isEmpty()){
 
-        call();
+        EventJDBCDAO.call(table, data);
         //table.getSelectionModel().clearSelection(0);NI
 
 
     }
-    else {call();}
+    else {EventJDBCDAO.call(table, data);}
 }
 
             /****/
@@ -347,6 +396,9 @@ if (ix < data.size()) {
             buttonHbTWO.setVisible(true);
             TextboxSearch.setVisible(false);
             TextboxInsertPK.setVisible(true);
+
+
+
         }
 	}
 
@@ -437,13 +489,26 @@ EventJDBCDAO lj=new EventJDBCDAO();
         }//Fine Handle()
     }//Fine search listner button
 
+
+
     public class DetailshButtonListener implements EventHandler<ActionEvent> {
 EventJDBCDAO lj=new EventJDBCDAO();
         @Override
         public void handle(ActionEvent e) {
-            String stringa = table.getItems().get(4).getUser_id().toString();
 
-call();
+
+
+//            String stringa = table.getItems().get(4).getUser_id().toString();
+
+            EventJDBCDAO.call(table, data);
+
+
+//            datainiziale=dataInizialeTextBox.getValue().toString();
+  //          datafinale = dataFinaleTextBox.getValue().toString();
+
+            EventJDBCDAO.searchDate(Server.QUERY_DATE_SEARCH, datainiziale, datafinale);
+
+
 /*************************/
         }//Fine Handle()
     }//Fine search listner button
@@ -451,27 +516,33 @@ call();
 
 
 
-    public void call(){
 
-        int lenght = table.getItems().size();//Numero elementi nella tabella
-        int i=0;
-        while (i<lenght-1) {
-            if (Objects.equals(table.getItems().get(i).getUser_id().toString(), table.getItems().get(i+1).getUser_id().toString()) &&
-                    Objects.equals(table.getItems().get(i).getData().toString(), table.getItems().get(i+1).getData().toString()) &&
-                    Objects.equals(table.getItems().get(i).getType_id().toString(), table.getItems().get(i+1).getType_id().toString())) {
-                table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-                table.requestFocus();
 
-                table.getSelectionModel().select(data.get(i));
-                table.getSelectionModel().select(data.get(i+1));
-
-                table.getSelectionModel().focus(4);
-                //table.getItems().
-                //  System.out.println("I:"+i+" J:"+ j +"DataA: "+table.getItems().get(i).getUser_id().toString() +"DataB: "+table.getItems().get(i).getData().toString()+" + "+ table.getItems().get(j).getUser_id().toString()+" "+table.getItems().get(j).getData().toString());
+    public void setCalendar(DatePicker checkInDatePicker){
+        //DatePicker checkInDatePicker = new DatePicker();
+                StringConverter converter = new StringConverter<LocalDate>() {
+            DateTimeFormatter dateFormatter =
+                    DateTimeFormatter.ofPattern(pattern);
+            @Override
+            public String toString(LocalDate date) {
+                if (date != null) {
+                    return dateFormatter.format(date);
+                } else {
+                    return "";
+                }
             }
-            i++;
-        }
+            @Override
+            public LocalDate fromString(String string) {
+                if (string != null && !string.isEmpty()) {
+                    return LocalDate.parse(string, dateFormatter);
+                } else {
+                    return null;
+                }
+            }
+        };
 
+        checkInDatePicker.setConverter(converter);
+        checkInDatePicker.setPromptText(pattern.toLowerCase());
     }
 
 

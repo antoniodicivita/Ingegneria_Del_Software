@@ -40,6 +40,7 @@ public class FxTableUser
     /*CONNE DB*/
 
 
+
     public TextField TextboxSearch;
     public Label LabelSearch;
     public TextField TextboxInsertPK;
@@ -62,9 +63,9 @@ public class FxTableUser
 
 	public static void main(String [] args) {
 
-		Application.launch(args);
-	}
+        Application.launch(args);
 
+    }
 	@Override
 	public void start(Stage primaryStage) {
 
@@ -220,12 +221,12 @@ public class FxTableUser
 
         buttonHbONE = new HBox(10);
         buttonHbONE.setAlignment(Pos.CENTER);
-        buttonHbONE.getChildren().addAll(LabelSearch, TextboxSearch,srcbtn);
+        buttonHbONE.getChildren().addAll(LabelSearch, TextboxSearch, srcbtn);
 
 
         buttonHbTWO = new HBox(10);
         buttonHbTWO.setAlignment(Pos.CENTER);
-        buttonHbTWO.getChildren().addAll(okbtn,backbtn);
+        buttonHbTWO.getChildren().addAll(okbtn, backbtn);
         buttonHbTWO.setVisible(false);
 
         // Status message text
@@ -446,6 +447,7 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
 
             actionStatus.setText("Dipendente: " + dipendente.toString());
 
+
             // Select a row
 
             if (table.getItems().size() == 0) {
@@ -483,7 +485,7 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
             String nome=table.getItems().get(ix).getNome().toString();
             String cognome=table.getItems().get(ix).getCognome().toString();
 
-            lj.details(Server.QUERY_DETAILS,nome, cognome);
+            lj.details(Server.QUERY_DETAILS, nome, cognome);
 
 
             actionStatus.setText("Dipendente: " + dipendente.toString());

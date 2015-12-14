@@ -155,7 +155,8 @@ public class BadgeGUI extends JFrame implements ActionListener {
 
 
         //Return_ID_User=amicoDB.SELECT_NameSurname(TextBoxNome.getText(), TextBoxCognome.getText(), TextBoxCodice.getText());
-        Return_ID_User = sensore.SELECT_NameSurname(Server.QUERY_RETURN_ID,TextBoxNome.getText(), TextBoxCognome.getText(), TextBoxCodice.getText());
+         Return_ID_User = Sensore.SELECT_NameSurname(Server.QUERY_RETURN_ID,TextBoxNome.getText(), TextBoxCognome.getText(), TextBoxCodice.getText());
+
         //String id =TextBoxCodice.getText();
         //Return_ID_User = Integer.parseInt(id);
 //        Return_ID_User =Sensore.SELECT_NameSurname(Server.QUERY_RETURN_ID,TextBoxNome.getText(), TextBoxCognome.getText(), TextBoxCodice.getText());

@@ -95,12 +95,9 @@ public class DipendenteJDBCDAO {
                 PrintWriter out = new PrintWriter(s.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
                 out.println(req);
-                //String line = in.readLine();
 
                 String nome = in.readLine();
                 while (nome.length() > 0) {
-                   //System.out.println(line);
-
 
                     nome = in.readLine();
                     String cognome = in.readLine();
@@ -291,9 +288,10 @@ public class DipendenteJDBCDAO {
 
                 nome = in.readLine();
                 String cognome = in.readLine();
+                String id =in.readLine();
 
-                if(nome!=null &&cognome !=null) {
-                    data.addAll(new Dipendente(nome, cognome, ""));
+                if(nome!=null &&cognome !=null && id!=null) {
+                    data.addAll(new Dipendente(nome, cognome, id));
                 }
             }
 

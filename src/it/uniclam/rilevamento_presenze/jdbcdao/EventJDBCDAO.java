@@ -6,8 +6,11 @@ import it.uniclam.rilevamento_presenze.connections.Server;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import it.uniclam.rilevamento_presenze.beanclass.Event;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableView;
 
 import javax.swing.*;
+import javax.swing.text.TabableView;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,7 +19,9 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by Chriz 7X on 06/12/2015.
@@ -123,8 +128,8 @@ public class EventJDBCDAO {Connection connection = null;
     }
 
 
-    public void MySQL_GridView(String type_query,String nome, String cognome){
-        JFrame frame = new JFrame("Dettagli Eventi");
+    public void cercaPerData(String type_query,String nome, String cognome){
+        JFrame frame = new JFrame("Incongruenze");
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         String columnNames[] = { "NOME", "COGNOME", "IN/OUT","DATA","ORA" };
         String req =  type_query +"\n" + nome+"\n" + cognome+"\n";
@@ -200,6 +205,26 @@ public class EventJDBCDAO {Connection connection = null;
 
     }
 
+    public void update(String type_query, String id) {
+
+        //String req = "UPDATE user SET Cognome='"+valueTWO+"' WHERE Nome='"+valueONE+"'AND Cognome'"+valueTWO+"'";
+        String req = type_query +"\n"  + id + "\n";
+
+        try {
+            Socket s = new Socket(Server.HOST, Server.PORT);
+            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            out.println(req);
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+    }
+
 
     //OK
 
@@ -229,6 +254,59 @@ public class EventJDBCDAO {Connection connection = null;
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+    }
+
+
+    public static  void searchDate(String type_query,String datainiziale, String datafinale){
+
+        String req = type_query +"\n" + datainiziale+"\n" + datafinale +"\n";
+
+        JFrame frame = new JFrame("Dettagli Eventi");
+        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        String columnNames[] = { "NOME", "COGNOME", "IN/OUT","DATA","ORA" };
+       // String req =  type_query +"\n" + nome+"\n" + cognome+"\n";
+
+        int count = 0;
+
+        try {
+            Socket s = new Socket(Server.HOST, Server.PORT);
+            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            out.println(req);
+
+            String nome=in.readLine();
+            if(nome.equals("OK")) {
+                nome = in.readLine();
+                int countrow = Integer.parseInt(nome);
+                Object rowData[][] = new Object[countrow][];
+
+
+                while (nome.length() > 0 && count < countrow) {
+
+                    nome = in.readLine();
+                    String Cognome = in.readLine();
+                    String INOUT = in.readLine();
+                    String Data = in.readLine();
+                    String Ora = in.readLine();
+
+
+                    rowData[count] = new Object[]{nome, Cognome, INOUT, Data, Ora};
+
+                    count++;
+                }
+
+
+                JTable table = new JTable(rowData, columnNames);
+                JScrollPane scrollPane = new JScrollPane(table);
+                frame.add(scrollPane, BorderLayout.CENTER);
+                frame.pack();//frame.setSize(AUTO)
+                frame.setVisible(true);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
     }
 
@@ -341,6 +419,39 @@ public class EventJDBCDAO {Connection connection = null;
 
         }
         return stringa;
+
+
+    }
+
+    public  static void call(TableView<Event> table, ObservableList<Event> data){
+
+        int lenght = table.getItems().size();//Numero elementi nella tabella
+        int i=0;
+
+
+        while (i<lenght-1) {
+            if (Objects.equals(table.getItems().get(i).getUser_id().toString(), table.getItems().get(i + 1).getUser_id().toString()) &&
+                    Objects.equals(table.getItems().get(i).getData().toString(), table.getItems().get(i + 1).getData().toString()) &&
+                    Objects.equals(table.getItems().get(i).getType_id().toString(), table.getItems().get(i + 1).getType_id().toString())) {
+                table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+                table.requestFocus();
+
+                table.getSelectionModel().select(data.get(i));
+                table.getSelectionModel().select(data.get(i + 1));
+
+
+                table.getSelectionModel().focus(4);
+
+
+
+                //table.getItems().
+                //  System.out.println("I:"+i+" J:"+ j +"DataA: "+table.getItems().get(i).getUser_id().toString() +"DataB: "+table.getItems().get(i).getData().toString()+" + "+ table.getItems().get(j).getUser_id().toString()+" "+table.getItems().get(j).getData().toString());
+            }
+            i++;
+
+
+        }
+
 
 
     }

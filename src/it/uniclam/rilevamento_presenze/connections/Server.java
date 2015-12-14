@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.*;
+import java.util.GregorianCalendar;
 
 //import it.uniclam.rilevamento_presenze.JDBCDataAccessObject.EventJDBCDAO;
 /**
@@ -32,6 +33,8 @@ public class Server {
     public static String QUERY_DETAILS = "req_details";
     public static String QUERY_CREATE_MONTH_REPORT = "req_create_month_report";
     public static String QUERY_CREATE_YEAR_REPORT = "req_create_year_report";
+    public static String QUERY_UPDATE_EVENT = "req_update_event";
+    public static String QUERY_DATE_SEARCH = "req_date_search";
 
 
     public static void main(String[] args) {
@@ -80,8 +83,8 @@ public class Server {
                         String id = in.readLine().replace("id_user", "");
 
 
-                        String query = "SELECT * FROM user WHERE Cognome='"+cognome+"'AND Nome='"+nome+"' OR ID_User='"+id+"' ";
-                        String count = returnId(query);
+                        String query = "SELECT Nome, Cognome, ID_User FROM user WHERE Cognome='"+cognome+"'AND Nome='"+nome+"' OR ID_User='"+id+"' ";
+                        String count = retId(query);
 
                         outchannel.println(count);
                         s.close();
@@ -102,6 +105,21 @@ public class Server {
                         outchannel.println(out);
                         s.close();
                     }
+
+                    else if (command.equals(QUERY_DATE_SEARCH)){
+
+
+                        String datainiziale = in.readLine();
+                        String datafinale = in.readLine();
+
+                        String query = "SELECT Nome, Cognome, Name_Type, Data, Hour FROM (event JOIN type ON Type_ID = ID_Type) JOIN user ON User_ID=ID_User WHERE (str_to_date(Data, '%d%b%Y')) >= '" + datainiziale + "' AND (str_to_date(Data, '%d%b%Y')) <= '" + datafinale+"'";
+                        String out = orderByDate(query);
+
+
+                        outchannel.println(out);
+                        s.close();
+                    }
+
 
                     else if(command.equals(QUERY_ADD_LIST)){
 
@@ -143,12 +161,26 @@ public class Server {
                         s.close();
                     }
 
+
+
+
                     else if(command.equals(QUERY_UPDATE_LIST)){
 
                         String nome = in.readLine().replace("valueONE", "");
                         String cognome = in.readLine().replace("valueTWO", "");
                         String id = in.readLine().replace("id", "");
                         String query = "UPDATE user SET Cognome='"+cognome+"', Nome='"+nome+"' WHERE ID_User='"+id+"'";
+                        String out = standardQueryExecutor(query);
+                        outchannel.println(out);
+                        s.close();
+                    }
+
+                    else if(command.equals(QUERY_UPDATE_EVENT)){
+
+                       // String event = in.readLine().replace("event", "");
+                        String id_event = in.readLine();
+                        String id = in.readLine().replace("id", "");
+                        String query = "UPDATE event SET  Type_ID='"+id_event+"' WHERE ID_User='"+id+"'";
                         String out = standardQueryExecutor(query);
                         outchannel.println(out);
                         s.close();
@@ -376,6 +408,7 @@ public class Server {
 
                 out += res.getString("Nome")+"\n";
                 out += res.getString("Cognome")+"\n";
+                out += res.getString("ID_User")+"\n";
 
 
             }
@@ -460,8 +493,7 @@ public class Server {
         return out;
     }
 
-    public static String returnId(String query) {
-
+    public static String retId(String query){
 
         String out = "Error!\n";
         try {
@@ -471,31 +503,21 @@ public class Server {
             Statement st = connection.createStatement();
             ResultSet res = st.executeQuery(query);
 
-
-            System.out.println(res.next());
-
             out = "OK\n";
-            while (res.next()){
+            while (res.next()) {
 
-                out += res.getString("Nome") + "\n";
-                out += res.getString("Cognome") + "\n";
-                out += res.getString("ID_User") + "\n";
+                out += res.getString("Nome")+ "\n";
+                out += res.getString("Cognome")+"\n";
+                out += res.getString("ID_User")+"\n";
 
             }
-
-
-            out += "\n";
-            res.close();
-
-
-
-        } catch (SQLException e) {
+        }catch (SQLException e) {
             e.printStackTrace();
 
         }
-
         return out;
     }
+
 
     public static String orderByDate(String query){
 
