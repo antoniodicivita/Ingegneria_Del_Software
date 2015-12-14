@@ -97,7 +97,7 @@ public class Server {
                         String nome = in.readLine().replace("nome", "");
                         String cognome = in.readLine().replace("cognome", "");
 
-                        String query = "SELECT DISTINCT Nome,Cognome, Name_Type, Data, Hour FROM (type JOIN event ON Type_ID=ID_Type) JOIN user ON User_ID=ID_User WHERE Nome='"+nome+"' AND Cognome='"+cognome+"' ORDER BY (str_to_date(Data, '%d%b%Y')) DESC  , (str_to_date(Hour, '%H:%i:%s')) DESC";
+                        String query = "SELECT DISTINCT Nome,Cognome, Name_Type, Data FROM (type JOIN event ON Type_ID=ID_Type) JOIN user ON User_ID=ID_User WHERE Nome='"+nome+"' AND Cognome='"+cognome+"' ORDER BY (str_to_date(Data, '%d%b%Y')) DESC  , (str_to_date(Hour, '%H:%i:%s')) DESC";
 
                         String out = orderByDate(query);
 
@@ -112,8 +112,8 @@ public class Server {
                         String datainiziale = in.readLine();
                         String datafinale = in.readLine();
 
-                        String query = "SELECT Nome, Cognome, Name_Type, Data, Hour FROM (event JOIN type ON Type_ID = ID_Type) JOIN user ON User_ID=ID_User WHERE (str_to_date(Data, '%d%b%Y')) >= '" + datainiziale + "' AND (str_to_date(Data, '%d%b%Y')) <= '" + datafinale+"'";
-                        String out = orderByDate(query);
+                        String query = "SELECT Nome, Cognome, Name_Type, Data FROM (event JOIN type ON Type_ID = ID_Type) JOIN user ON User_ID=ID_User WHERE (str_to_date(Data, '%d%b%Y')) >= '" + datainiziale + "' AND (str_to_date(Data, '%d%b%Y')) <= '" + datafinale+"' ORDER BY  (str_to_date(Data, '%d%b%Y')) DESC, User_ID";
+                        String out = searchDate(query);
 
 
                         outchannel.println(out);
@@ -555,6 +555,45 @@ public class Server {
         return out;
 
     }
+
+
+    public static String searchDate(String query){
+
+        String out="Error!\n";
+        try {
+            connection = ConnectionDB.getInstance().getConnection();
+
+            Statement st = connection.createStatement();
+            ResultSet res= st.executeQuery(query);
+
+            int rowcount = 0;
+            if (res.last()) {
+                rowcount = res.getRow();
+                res.beforeFirst();
+            }
+
+            out = "OK\n";
+            out += rowcount+"\n";
+            while (res.next()==true) {
+
+                out += res.getString("Nome")+ "\n";
+                out += res.getString("Cognome")+ "\n";
+                out += res.getString("Name_Type")+ "\n";
+                out += res.getString("Data")+ "\n";
+                //out += res.getString("Hour")+ "\n";
+
+
+            }
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return out;
+
+    }
+
 
     public static String standardQueryExecutor(String query){
 

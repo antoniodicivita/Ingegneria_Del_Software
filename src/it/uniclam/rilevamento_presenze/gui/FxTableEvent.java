@@ -509,7 +509,38 @@ EventJDBCDAO lj=new EventJDBCDAO();
             //data = EventJDBCDAO.searchDate(Server.QUERY_DATE_SEARCH, datainiziale, datafinale);
           //  EventJDBCDAO.call(table, data);
             data = lj.searchDate(Server.QUERY_DATE_SEARCH, datainiziale, datafinale);
-            
+            table.setItems(data);
+            //lj.call(table, data);
+            int lenght = table.getItems().size();//Numero elementi nella tabella
+            int i=0;
+System.out.println(lenght);
+            table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            table.requestFocus();
+            while (i<lenght-1) {
+                if (Objects.equals(table.getItems().get(i).getUser_id().toString(), table.getItems().get(i + 1).getUser_id().toString()) &&
+                        Objects.equals(table.getItems().get(i).getData().toString(), table.getItems().get(i + 1).getData().toString()) &&
+                        Objects.equals(table.getItems().get(i).getType_id().toString(), table.getItems().get(i + 1).getType_id().toString())) {
+
+
+                    table.getSelectionModel().select(data.get(i));
+                    table.getSelectionModel().select(data.get(i + 1));
+
+
+                    table.getSelectionModel().focus(4);
+
+
+
+                    //table.getItems().
+                    //  System.out.println("I:"+i+" J:"+ j +"DataA: "+table.getItems().get(i).getUser_id().toString() +"DataB: "+table.getItems().get(i).getData().toString()+" + "+ table.getItems().get(j).getUser_id().toString()+" "+table.getItems().get(j).getData().toString());
+                }
+                i++;
+
+
+            }
+
+
+
+
 /*************************/
         }//Fine Handle()
     }//Fine search listner button

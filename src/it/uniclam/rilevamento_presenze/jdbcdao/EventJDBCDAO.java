@@ -311,7 +311,7 @@ public class EventJDBCDAO {Connection connection = null;
     }
 
 */
-    public static  ObservableList searchDate(String type_query,String datainiziale, String datafinale){
+    public static  ObservableList<Event> searchDate(String type_query,String datainiziale, String datafinale){
 
         String req = type_query +"\n" + datainiziale+"\n" + datafinale +"\n";
 
@@ -362,7 +362,7 @@ public class EventJDBCDAO {Connection connection = null;
             e.printStackTrace();
         }
 
-       ObservableList data = FXCollections.observableList(list);
+       ObservableList<Event> data = FXCollections.observableList(list);
         return  data;
     }
 
