@@ -147,6 +147,7 @@ public class FxTableEvent
 
 
         TableColumn typeCol = new TableColumn("IN/OUT");
+
         typeCol.setCellValueFactory(new PropertyValueFactory<Event, String>("type_id"));
         typeCol.setCellFactory(TextFieldTableCell.forTableColumn());
         typeCol.setOnEditCommit(new EventHandler<CellEditEvent<Event, String>>() {
@@ -160,24 +161,38 @@ public class FxTableEvent
 
                 //Aggiorno il valore nel database INIZIO:
                 int ix = table.getSelectionModel().getFocusedIndex();
+
                 Event event = (Event) table.getSelectionModel().getSelectedItem();
-                System.out.println(ix);
+               // System.out.println(ix);
 
 
 
                 //String nome=table.getItems().get(ix).getNome().toString();
-                String name_type=table.getItems().get(ix).getType_id().toString();
-               // String name_type=table.getSelectionModel().ge;
-                System.out.println(name_type);
-                if(Objects.equals(name_type,"INGRESSO")){name_type="1";}
-                else {name_type="2";}
-                String id_event=table.getSelectionModel().getSelectedItem().getEvent_id();
+                String name_type=table.getItems().get(ix).getType_id();//ideventp
+                String idevento=table.getItems().get(ix).getEvent_id();//inout
+                String x=table.getItems().get(ix).getData();//data
+                String y =table.getItems().get(ix).getHour();//nome
+                String z =table.getItems().get(ix).getUser_id();//Cognome
+                //getItems().get(ix).getType_id().toString();
+               // table.getItems().get(ix).toString();
+                //String name_type=table.getSelectionModel().getSelectedItem().getType_id();
+                String id_event=table.getItems().get(ix).getEvent_id().toString();
+                System.out.println(name_type +"   "+ idevento + "  " + x+"  " +y+"  " +z);
+                if(Objects.equals(name_type,"Entrata")){
+                    name_type="1";
+                System.out.println("IF: ");
+                    lj.update(Server.QUERY_UPDATE_EVENT,  "2",name_type);
 
-                // System.out.println(autore+"tralalal");
+                }
+                else {System.out.println("else: ");
+                    lj.update(Server.QUERY_UPDATE_EVENT,  "1",name_type);}
+
+
+                    // System.out.println(autore+"tralalal");
                 //update
                 // lj.updateList(Server.QUERY_UPDATE_LIST, nome, cognome);
                 //Aggiorno il valore nel database FINE:
-                lj.update(Server.QUERY_UPDATE_LIST, name_type,id_event);
+
                 System.out.println("Ho modificato il valore di COL 2");
             }
         });
@@ -399,7 +414,7 @@ if (ix < data.size()) {
                 String user_id=res.getString("Cognome");
                 String type_id= res.getString("Name_Type");
                 String event_id=res.getString("ID_Event");
-                list.add(new Event(user_id,data,ora,type_id,event_id));
+                list.add(new Event(user_id,data,ora,event_id,type_id));
 
 //cognome, data, nome, nametype
 
