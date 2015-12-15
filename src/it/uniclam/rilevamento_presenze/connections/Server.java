@@ -97,7 +97,7 @@ public class Server {
                         String nome = in.readLine().replace("nome", "");
                         String cognome = in.readLine().replace("cognome", "");
 
-                        String query = "SELECT DISTINCT Nome,Cognome, Name_Type, Data FROM (type JOIN event ON Type_ID=ID_Type) JOIN user ON User_ID=ID_User WHERE Nome='"+nome+"' AND Cognome='"+cognome+"' ORDER BY (str_to_date(Data, '%d%b%Y')) DESC  , (str_to_date(Hour, '%H:%i:%s')) DESC";
+                        String query = "SELECT  Nome,Cognome, Name_Type, Data,Hour FROM (type JOIN event ON Type_ID=ID_Type) JOIN user ON User_ID=ID_User WHERE Nome='"+nome+"' AND Cognome='"+cognome+"' ORDER BY (str_to_date(Data, '%d%b%Y')) DESC  , (str_to_date(Hour, '%H:%i:%s')) DESC";
 
                         String out = orderByDate(query);
 
@@ -124,7 +124,7 @@ public class Server {
                     else if(command.equals(QUERY_ADD_LIST)){
 
                         String valueOne = in.readLine().replace("valueONE", "");
-                        String query = "INSERT INTO user(Cognome,Nome) VALUES ('"+valueOne+"','Pippo')";
+                        String query = "INSERT INTO user(Cognome,Nome) VALUES ('"+valueOne+"','')";
 
                         String out = standardQueryExecutor(query);
                         outchannel.println(out);
@@ -574,10 +574,12 @@ public class Server {
 
             while (res.next()==true) {
 
-                out += res.getString("Cognome")+ "\n";
+
                 out += res.getString("Nome")+ "\n";
-                out += res.getString("Data")+ "\n";
+                out += res.getString("Cognome")+ "\n";
                 out += res.getString("Name_Type")+ "\n";
+                out += res.getString("Data")+ "\n";
+
                 out += res.getString("ID_Event")+ "\n";
 
                 //out += res.getString("Hour")+ "\n";

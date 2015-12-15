@@ -240,8 +240,9 @@ public class FxTableUser
 
 		// Scene
 		Scene scene = new Scene(vbox, 500, 550); // w x h
-		primaryStage.setScene(scene);
 		primaryStage.show();
+        table.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+        primaryStage.setScene(scene);
         primaryStage.setMaximized(true);
 
 		// Select the first row

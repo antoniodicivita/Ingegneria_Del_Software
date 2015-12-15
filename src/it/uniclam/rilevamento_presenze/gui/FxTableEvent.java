@@ -1,6 +1,5 @@
 package it.uniclam.rilevamento_presenze.gui;
 
-import it.uniclam.rilevamento_presenze.beanclass.Dipendente;
 import it.uniclam.rilevamento_presenze.beanclass.Event;
 import it.uniclam.rilevamento_presenze.connections.ConnectionDB;
 import it.uniclam.rilevamento_presenze.connections.Server;
@@ -32,13 +31,10 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
-import java.awt.color.ColorSpace;
-import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.Date;
 
 
 public class FxTableEvent
@@ -133,7 +129,7 @@ public class FxTableEvent
 
 
         TableColumn hourCol = new TableColumn("NOME");
-		hourCol.setCellValueFactory(new PropertyValueFactory<Event, String>("hour"));
+		hourCol.setCellValueFactory(new PropertyValueFactory<Event, String>("nome"));
 		hourCol.setCellFactory(TextFieldTableCell.forTableColumn());
 		hourCol.setOnEditCommit(new EventHandler<CellEditEvent<Event, String>>() {
             @Override
@@ -141,7 +137,7 @@ public class FxTableEvent
 
                 ((Event) t.getTableView().getItems().get(
                         t.getTablePosition().getRow())
-                ).setHour(t.getNewValue());
+                ).setNome(t.getNewValue());
             }
         });
 
@@ -157,41 +153,28 @@ public class FxTableEvent
                 EventJDBCDAO lj = new EventJDBCDAO();
                         ((Event) t.getTableView().getItems().get(
                                         t.getTablePosition().getRow())
-                        ).setEvent_id(t.getNewValue());
+                        ).setType_id(t.getNewValue());
 
                 //Aggiorno il valore nel database INIZIO:
                 int ix = table.getSelectionModel().getFocusedIndex();
 
-                Event event = (Event) table.getSelectionModel().getSelectedItem();
-               // System.out.println(ix);
+               // Event event = (Event) table.getSelectionModel().getSelectedItem();
 
 
+                String id_event = table.getItems().get(ix).getEvent_id().toString();
+                String id_type = table.getItems().get(ix).getType_id().toString();
 
-                //String nome=table.getItems().get(ix).getNome().toString();
-                String name_type=table.getItems().get(ix).getType_id();//ideventp
-                String idevento=table.getItems().get(ix).getEvent_id();//inout
-                String x=table.getItems().get(ix).getData();//data
-                String y =table.getItems().get(ix).getHour();//nome
-                String z =table.getItems().get(ix).getUser_id();//Cognome
-                //getItems().get(ix).getType_id().toString();
-               // table.getItems().get(ix).toString();
-                //String name_type=table.getSelectionModel().getSelectedItem().getType_id();
-                String id_event=table.getItems().get(ix).getEvent_id().toString();
-                System.out.println(name_type +"   "+ idevento + "  " + x+"  " +y+"  " +z);
-                if(Objects.equals(name_type,"Entrata")){
-                    name_type="1";
-                System.out.println("IF: ");
-                    lj.update(Server.QUERY_UPDATE_EVENT,  "2",name_type);
+                if(Objects.equals(id_type,"Entrata")){
+                    id_type="1";
+
+                    lj.update(Server.QUERY_UPDATE_EVENT, id_type,id_event);
 
                 }
-                else {System.out.println("else: ");
-                    lj.update(Server.QUERY_UPDATE_EVENT,  "1",name_type);}
+                else if (Objects.equals(id_type,"Uscita")){
+                    id_type="2";
+                    lj.update(Server.QUERY_UPDATE_EVENT,id_type,  id_event);}
 
 
-                    // System.out.println(autore+"tralalal");
-                //update
-                // lj.updateList(Server.QUERY_UPDATE_LIST, nome, cognome);
-                //Aggiorno il valore nel database FINE:
 
                 System.out.println("Ho modificato il valore di COL 2");
             }
@@ -201,7 +184,7 @@ public class FxTableEvent
 
 
          TableColumn userCol = new TableColumn("COGNOME");
-        userCol.setCellValueFactory(new PropertyValueFactory<Event, String>("user_id"));
+        userCol.setCellValueFactory(new PropertyValueFactory<Event, String>("cognome"));
         userCol.setCellFactory(TextFieldTableCell.forTableColumn());
         userCol.setOnEditCommit(new EventHandler<CellEditEvent<Event, String>>() {
             @Override
@@ -209,7 +192,7 @@ public class FxTableEvent
 
                 ((Event) t.getTableView().getItems().get(
                         t.getTablePosition().getRow())
-                ).setUser_id((t.getNewValue()));
+                ).setCognome((t.getNewValue()));
 
                 //Aggiorno il valore nel database INIZIO:
                 int ix = table.getSelectionModel().getSelectedIndex();
@@ -217,9 +200,9 @@ public class FxTableEvent
                 System.out.println(ix);
 
 
-                String nome = table.getItems().get(ix).getHour().toString();
+                String nome = table.getItems().get(ix).getNome().toString();
                 String cognome = table.getItems().get(ix).getData().toString();
-                String user_id = table.getItems().get(ix).getUser_id().toString();
+                String user_id = table.getItems().get(ix).getCognome().toString();
                 String type_id = table.getItems().get(ix).getType_id().toString();
                 // System.out.println(autore+"tralalal");
                 //update
@@ -231,7 +214,7 @@ public class FxTableEvent
         });
 
         final TableColumn event_idCol = new TableColumn("ID");
-        event_idCol.setCellValueFactory(new PropertyValueFactory<Dipendente, String>("event_id"));
+        event_idCol.setCellValueFactory(new PropertyValueFactory<Event, String>("event_id"));
         event_idCol.setCellFactory(TextFieldTableCell.forTableColumn());
         event_idCol.setOnEditCommit(new EventHandler<CellEditEvent<Event, String>>() {
             @Override
@@ -244,9 +227,9 @@ public class FxTableEvent
                 ).setEvent_id(t.getNewValue());
 
                 //Modifica dei campi quando faccio invio (COLONNA 1)
-                int ix = table.getSelectionModel().getSelectedIndex();
+                //int ix = table.getSelectionModel().getSelectedIndex();
                 Event event = (Event) table.getSelectionModel().getSelectedItem();
-                System.out.println(ix);
+               // System.out.println(ix);
                 /*String nome=table.getItems().get(ix).getNome().toString();
                 String cognome=table.getItems().get(ix).getCognome().toString();
                 String id_employee=table.getItems().get(ix).getId_employee().toString();
@@ -275,18 +258,13 @@ public class FxTableEvent
         /********************************/
 
 		// Add and delete buttons
-		Button addbtn = new Button("Aggiungi");
-		addbtn.setOnAction(new AddButtonListener());
+		Button backbtn = new Button("Indietro");
+		backbtn.setOnAction(new BackButtonListener());
 		Button delbtn = new Button("Elimina");
 		delbtn.setOnAction(new DeleteButtonListener());
         Button srcbtn=new Button("Trova");
         srcbtn.setOnAction(new SearchButtonListener());
-        Button okbtn=new Button("OK");
-        okbtn.setOnAction(new OKButtonListener());
-        Button detailsbtn=new Button("Vedi Incongruenza/e");
-        detailsbtn.setOnAction(new DetailshButtonListener());
-        Button backbtn=new Button("Annulla");
-        backbtn.setOnAction(new SearchButtonListener());
+
 
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -307,13 +285,14 @@ public class FxTableEvent
         setCalendar(dataInizialeTextBox);
 
 
-//        DatePicker dataFinaleTextBox = new DatePicker();
 
         Label dataFinale = new Label("Data Finale");
-        gridPane.add(dataFinale, 10,0);
+        gridPane.add(dataFinale, 4,0);
+
         //gridPane2.setGridLinesVisible(true);
         GridPane.setHalignment(dataFinale, HPos.CENTER);
-        gridPane.add(dataFinaleTextBox, 10, 1);
+        gridPane.add(dataFinaleTextBox, 4, 1);
+       gridPane.add(srcbtn,5 ,1);
 
         setCalendar(dataFinaleTextBox);
 
@@ -333,17 +312,17 @@ public class FxTableEvent
 
 		buttonHb = new HBox(10);
 		buttonHb.setAlignment(Pos.CENTER);
-		buttonHb.getChildren().addAll(addbtn, delbtn, detailsbtn);
+		buttonHb.getChildren().addAll(backbtn, delbtn);
 
         buttonHbONE = new HBox(10);
         buttonHbONE.setAlignment(Pos.CENTER);
        // buttonHbONE.getChildren().addAll(LabelSearch, TextboxSearch, srcbtn);
-        buttonHbONE.getChildren().addAll(srcbtn);
+        buttonHbONE.getChildren().addAll(gridPane);
 
         buttonHbTWO = new HBox(10);
         buttonHbTWO.setAlignment(Pos.CENTER);
-        buttonHbTWO.getChildren().addAll(okbtn,backbtn);
-        buttonHbTWO.setVisible(false);
+        buttonHbTWO.getChildren().addAll(backbtn);
+       // buttonHbTWO.setVisible(false);
 
         // Status message text
         actionStatus = new Text();
@@ -353,10 +332,10 @@ public class FxTableEvent
 		VBox vbox = new VBox(20);
 		vbox.setPadding(new Insets(25, 25, 25, 25));;
 		//vbox.getChildren().addAll(labelHb,buttonHbONE,table, buttonHb,buttonHbTWO,TextboxInsertPK,actionStatus,gridPane);
-        vbox.getChildren().addAll(labelHb,gridPane,buttonHbONE,table, buttonHb,buttonHbTWO,TextboxInsertPK,actionStatus);
+        vbox.getChildren().addAll(labelHb,buttonHbONE,table,buttonHb,buttonHbTWO,TextboxInsertPK,actionStatus);
 		// Scene
 		Scene scene = new Scene(vbox, 500, 550); // w x h
-        table.getStylesheets().add(getClass().getResource("table.css").toExternalForm());
+        table.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
@@ -409,18 +388,16 @@ if (ix < data.size()) {
 
             while (res.next()==true) {
 
-                String ora=res.getString("Nome");
+                String nome=res.getString("Nome");
                 String data= res.getString("Data");
-                String user_id=res.getString("Cognome");
+                String cognome=res.getString("Cognome");
                 String type_id= res.getString("Name_Type");
                 String event_id=res.getString("ID_Event");
-                list.add(new Event(user_id,data,ora,event_id,type_id));
+                list.add(new Event(cognome, nome,data,type_id, event_id));
 
-//cognome, data, nome, nametype
 
             }
 
-            //if(res.next()==false) { System.out.println("ACCESSO NEGATO:Badge non valido");}
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -506,7 +483,7 @@ EventJDBCDAO lj=new EventJDBCDAO();
 
             //System.out.println(table.getItems().get(ix).getTitle().toString());//Titolo X selezionato OK
             //System.out.println(table.getItems().get(ix).getAuthor().toString());//Autore X selezionato OK
-            String titolo=table.getItems().get(ix).getHour().toString();
+            String titolo=table.getItems().get(ix).getNome().toString();
             String autore=table.getItems().get(ix).getData().toString();
             data.remove(ix);//Elimino l'elemento dalla tabella e la aggiorno
            // lj.removeList(Server.QUERY_REMOVE_LIST,titolo,autore);
@@ -542,15 +519,13 @@ EventJDBCDAO lj=new EventJDBCDAO();
 //Elimino tutti gli elementi dalla tabella ( NON dal database)
             /*************************/
             table.getItems().clear();
+
             datainiziale=dataInizialeTextBox.getValue().toString();
             datafinale = dataFinaleTextBox.getValue().toString();
 
-            //data = EventJDBCDAO.searchDate(Server.QUERY_DATE_SEARCH, datainiziale, datafinale);
-            //  EventJDBCDAO.call(table, data);
-            data = lj.searchDate(Server.QUERY_DATE_SEARCH, datainiziale, datafinale);
+            data=lj.searchDate(Server.QUERY_DATE_SEARCH, datainiziale, datafinale);
+
             table.setItems(data);
-            lj.call(table, data);
-          //  lj.searchList(Server.QUERY_SEARCH_LIST,value,data);
 
 
 
@@ -567,7 +542,7 @@ EventJDBCDAO lj=new EventJDBCDAO();
 
 
 
-//            String stringa = table.getItems().get(4).getUser_id().toString();
+//            String stringa = table.getItems().get(4).getCognome().toString();
 
             //EventJDBCDAO.call(table, data);
 
@@ -582,6 +557,21 @@ EventJDBCDAO lj=new EventJDBCDAO();
     }//Fine search listner button
 
 
+    private class BackButtonListener implements EventHandler<ActionEvent> {
+
+        EventJDBCDAO lj=new EventJDBCDAO();
+        @Override
+        public void handle(ActionEvent e) {
+           // table.getItems().clear();
+           ObservableList<Event> return_table_data = getInitialTableData();
+           table.setItems(return_table_data);
+            lj.call(table, return_table_data);
+
+
+
+/*************************/
+        }//Fine Handle()
+    }//Fine search listner button
 
 
 

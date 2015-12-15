@@ -1,15 +1,14 @@
 package it.uniclam.rilevamento_presenze.beanclass;
 
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 /**
  * Created by Chriz 7X on 06/12/2015.
  */
 public class Event {
-    private SimpleStringProperty hour;//NOme=HOUR
+    private SimpleStringProperty nome;//NOme=HOUR
     private SimpleStringProperty data;//COgnome=Data
-    private SimpleStringProperty user_id;
+    private SimpleStringProperty cognome;
     private SimpleStringProperty type_id;
     private SimpleStringProperty event_id;
 
@@ -18,20 +17,20 @@ public class Event {
 
     public Event(String s1, String s2,String s3,String s4,String s5) {
 
-        hour = new SimpleStringProperty(s3);
-        data = new SimpleStringProperty(s2);
-        user_id = new SimpleStringProperty(s1);
+        cognome = new SimpleStringProperty(s1);
+        nome = new SimpleStringProperty(s2);
+        data = new SimpleStringProperty(s3);
         type_id = new SimpleStringProperty(s4);
         event_id=new SimpleStringProperty(s5);
     }
 
-    public String getHour() {
+    public String getNome() {
 
-        return hour.get();
+        return nome.get();
     }
-    public void setHour(String s) {
+    public void setNome(String s) {
 
-        hour.set(s);
+        nome.set(s);
     }
 
     public String getData() {
@@ -52,13 +51,13 @@ public class Event {
         type_id.set(s);
     }
 
-    public String getUser_id() {
+    public String getCognome() {
 
-        return user_id.get();
+        return cognome.get();
     }
-    public void setUser_id(String s) {
+    public void setCognome(String s) {
 
-        user_id.set(s);
+        cognome.set(s);
     }
 
     public String getEvent_id() {
@@ -70,9 +69,10 @@ public class Event {
         event_id.set(s);
     }
 
+
     @Override
     public String toString() {
 
-        return ("IL DIPENDENTE: "+user_id.get()+" "+ hour.get() + "IN DATA" +data.get()+"HA EFFETTUATO UN "+type_id.get());
+        return ("IL DIPENDENTE: "+ cognome.get()+" "+ nome.get() + "IN DATA" +data.get()+"HA EFFETTUATO UN "+type_id.get());
     }
 }

@@ -10,7 +10,6 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableView;
 
 import javax.swing.*;
-import javax.swing.text.TabableView;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,7 +18,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Objects;
 
@@ -66,144 +64,8 @@ public class EventJDBCDAO {Connection connection = null;
 
 
 
-    public void removeList(String type_query,String valueONE,String valueTWO){
-
-        String req= type_query +"\n" + valueONE + "\n"+ valueTWO + "\n";
-
-        try {
-            Socket s = new Socket(Server.HOST, Server.PORT);
-
-            PrintWriter out =new PrintWriter(s.getOutputStream(),true);
-            BufferedReader in= new BufferedReader(new InputStreamReader(s.getInputStream()));
-            out.println(req);
-            String line=in.readLine();
-
-            System.out.println(line);
-            s.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
 
 
-    public ObservableList<Event> SELECT_List_Event(String type_query){
-        List<Event> list = new ArrayList<>();
-        String req= type_query +"\n";
-
-        try {
-            Socket s = new Socket(Server.HOST, Server.PORT);
-
-            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-            out.println(req);
-            //String line = in.readLine();
-
-            String ora = in.readLine();
-            while (ora.length() > 0) {
-                //System.out.println(line);
-
-
-                ora = in.readLine();
-                String data = in.readLine();
-              //  list.add(new Event(ora,data));
-
-
-
-                System.out.println("STAMPA: "+ora+ " e: "+ data);
-            }
-
-
-
-            s.close();
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        ObservableList<Event> data = FXCollections.observableList(list);
-        return data;
-    }
-
-
-    public void cercaPerData(String type_query,String nome, String cognome){
-        JFrame frame = new JFrame("Incongruenze");
-        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        String columnNames[] = { "NOME", "COGNOME", "IN/OUT","DATA","ORA" };
-        String req =  type_query +"\n" + nome+"\n" + cognome+"\n";
-
-
-        try {
-            Socket s  = new Socket(Server.HOST, Server.PORT);
-
-            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-            out.println(req);
-
-            int count=0;
-
-            String line=in.readLine();
-            int countrow =Integer.parseInt(line);
-            Object rowData[][] = new Object[countrow][];
-
-
-            while(line.length()>0&&count<countrow){
-
-                String Nome=in.readLine();
-                String Cognome=in.readLine();
-                String INOUT=in.readLine();
-                String Data=in.readLine();
-                String Ora=in.readLine();
-
-
-                rowData[count] = new Object[]{Nome,Cognome,INOUT,Data,Ora};
-
-                count++;
-                System.out.println(Nome+Cognome+INOUT+Data+Ora);
-
-
-            }
-            s.close();
-
-            JTable table = new JTable(rowData, columnNames);
-            JScrollPane scrollPane = new JScrollPane(table);
-            frame.add(scrollPane, BorderLayout.CENTER);
-            frame.pack();//frame.setSize(AUTO)
-            frame.setVisible(true);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-
-
-
-
-    }
-
-
-    public void updateList(String type_query,String nome,String cognome) {
-
-        //String req = "UPDATE user SET Cognome='"+valueTWO+"' WHERE Nome='"+valueONE+"'AND Cognome'"+valueTWO+"'";
-        String req = type_query +"\n" + nome+"\n" + cognome+"\n";
-
-        try {
-            Socket s = new Socket(Server.HOST, Server.PORT);
-            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-            out.println(req);
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-
-    }
 
     public void update(String type_query, String name_type, String id_event) {
 
@@ -229,88 +91,8 @@ public class EventJDBCDAO {Connection connection = null;
     //OK
 
 
-    public void searchList(String type_query,String chiavericerca,ObservableList<Dipendente> value){
-
-        String req = type_query +"\n" + chiavericerca+"\n";
-
-        ObservableList<Dipendente> data=value;
-        try {
-            Socket s = new Socket(Server.HOST, Server.PORT);
-            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-            out.println(req);
-
-            String nome = in.readLine();
-            while (nome.length() > 0) {
-
-                nome = in.readLine();
-                String cognome = in.readLine();
-
-                data.addAll(new Dipendente("",nome, cognome));
-
-            }
 
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-/*
-
-    public static  void searchDate(String type_query,String datainiziale, String datafinale){
-
-        String req = type_query +"\n" + datainiziale+"\n" + datafinale +"\n";
-
-        JFrame frame = new JFrame("Dettagli Eventi");
-        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        String columnNames[] = { "NOME", "COGNOME", "IN/OUT","DATA","ORA" };
-       // String req =  type_query +"\n" + nome+"\n" + cognome+"\n";
-
-        int count = 0;
-
-        try {
-            Socket s = new Socket(Server.HOST, Server.PORT);
-            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-            out.println(req);
-
-            String nome=in.readLine();
-            if(nome.equals("OK")) {
-                nome = in.readLine();
-                int countrow = Integer.parseInt(nome);
-                Object rowData[][] = new Object[countrow][];
-
-
-                while (nome.length() > 0 && count < countrow) {
-
-                    nome = in.readLine();
-                    String Cognome = in.readLine();
-                    String INOUT = in.readLine();
-                    String Data = in.readLine();
-                    String Ora = in.readLine();
-
-
-                    rowData[count] = new Object[]{nome, Cognome, INOUT, Data, Ora};
-
-                    count++;
-                }
-
-
-                JTable table = new JTable(rowData, columnNames);
-                JScrollPane scrollPane = new JScrollPane(table);
-                frame.add(scrollPane, BorderLayout.CENTER);
-                frame.pack();//frame.setSize(AUTO)
-                frame.setVisible(true);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-*/
     public static  ObservableList<Event> searchDate(String type_query,String datainiziale, String datafinale){
 
         String req = type_query +"\n" + datainiziale+"\n" + datafinale +"\n";
@@ -328,10 +110,6 @@ public class EventJDBCDAO {Connection connection = null;
 
             String nome=in.readLine();
             if(nome.equals("OK")) {
-                //nome = in.readLine();
-              // int countrow = Integer.parseInt(nome);
-
-
 
                 while (nome.length() > 0 ) {
 
@@ -342,8 +120,10 @@ public class EventJDBCDAO {Connection connection = null;
                     String id_event = in.readLine();
                    // String Ora = in.readLine();
 
-                    if(nome !=null && Cognome!=null && INOUT!=null && Data!=null){
-                    list.add(new Event(Cognome,INOUT, nome, Data,id_event));}
+                    if(nome !=null && Cognome!=null && INOUT!=null && Data!=null&& id_event!=null){
+                    list.add(new Event(Cognome,nome,Data,INOUT,id_event));
+                        //System.out.println(Cognome+" " +nome+" " +Data+" " +INOUT+" " +id_event);
+                    }
 
                 }
 
@@ -353,133 +133,28 @@ public class EventJDBCDAO {Connection connection = null;
             e.printStackTrace();
         }
 
-       ObservableList<Event> data = FXCollections.observableList(list);
-        return  data;
+
+        ObservableList<Event> date_ordered = FXCollections.observableList(list);
+
+
+        //return date_ordered;
+        return  insertOnlyInconsistences(date_ordered);
     }
 
 
 
-    public int SELECT_NameSurname(String name,String surname,String id_user) {
-
-        int state=0;
-        try {
-            String queryString = "SELECT * FROM user WHERE Cognome='"+surname+"'AND Nome='"+name+"' OR ID_User='"+id_user+"' ";
-            connection = getConnection();
-            //System.out.println("Prepare statemòent OK");
-            Statement st = connection.createStatement();
-            ResultSet res = st.executeQuery(queryString);
-          /* if (res.next()!=false){
-                System.out.println("ACCESSO VALIDO");
-*/
-            while (res.next()==true) {
-                int id=res.getInt("ID_User");
-                String nome = res.getString("Nome");
-                String cognome = res.getString("Cognome");
-                //String telefono=res.getString("Telefono");
-
-                //  System.out.println(id + "\t" + nome + "\t" + cognome+ "\t" + telefono);
-                state=id;}
-            //if(res.next()==false) { System.out.println("ACCESSO NEGATO:Badge non valido");}
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-
-                if (resultSet != null)
-                    resultSet.close();
-                if (ptmt != null)
-                    ptmt.close();
-                if (connection != null)
-                    connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
-        return state;
-    }
-
-    public String genPDF(String type_query){
-
-        String req = type_query +"\n";
 
 
-        try {
-            Socket s = new Socket(Server.HOST, Server.PORT);
 
-            PrintWriter out =new PrintWriter(s.getOutputStream(),true);
-            BufferedReader in= new BufferedReader(new InputStreamReader(s.getInputStream()));
-            out.println(req);
-            String line=in.readLine();
-
-            System.out.println(line);
-            s.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return req;
-
-    }
-
-
-    public String SELECT_PDF() {
-
-        int state=0;
-        String stringa="";
-        try {
-            String queryString = "SELECT * FROM user  ";
-            connection = getConnection();
-            System.out.println("CO");
-            Statement st = connection.createStatement();
-            ResultSet res = st.executeQuery(queryString);
-          /* if (res.next()!=false){
-                System.out.println("ACCESSO VALIDO");
-*/
-            while (res.next()==true) {
-                int id=res.getInt("ID_User");
-                String nome = res.getString("Nome");
-                String cognome = res.getString("Cognome");
-
-                stringa=id + "\t" + nome + "\t" + cognome;
-                System.out.println(id + "\t" + nome + "\t" + cognome);
-                state=id;}
-            //if(res.next()==false) { System.out.println("ACCESSO NEGATO:Badge non valido");}
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-
-                if (resultSet != null)
-                    resultSet.close();
-                if (ptmt != null)
-                    ptmt.close();
-                if (connection != null)
-                    connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
-        return stringa;
-
-
-    }
 
     public  static void call(TableView<Event> table, ObservableList<Event> data){
 
-        int lenght = table.getItems().size();//Numero elementi nella tabella
+        int lenght = data.size();//Numero elementi nella tabella
         int i=0;
 
 
         while (i<lenght-1) {
-            if (Objects.equals(table.getItems().get(i).getUser_id().toString(), table.getItems().get(i + 1).getUser_id().toString()) &&
+            if (Objects.equals(table.getItems().get(i).getCognome().toString(), table.getItems().get(i + 1).getCognome().toString()) &&
                     Objects.equals(table.getItems().get(i).getData().toString(), table.getItems().get(i + 1).getData().toString()) &&
                     Objects.equals(table.getItems().get(i).getType_id().toString(), table.getItems().get(i + 1).getType_id().toString())) {
                 table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -494,9 +169,10 @@ public class EventJDBCDAO {Connection connection = null;
 
 
                 //table.getItems().
-                //  System.out.println("I:"+i+" J:"+ j +"DataA: "+table.getItems().get(i).getUser_id().toString() +"DataB: "+table.getItems().get(i).getData().toString()+" + "+ table.getItems().get(j).getUser_id().toString()+" "+table.getItems().get(j).getData().toString());
+                //  System.out.println("I:"+i+" J:"+ j +"DataA: "+table.getItems().get(i).getCognome().toString() +"DataB: "+table.getItems().get(i).getData().toString()+" + "+ table.getItems().get(j).getCognome().toString()+" "+table.getItems().get(j).getData().toString());
             }
             i++;
+
 
 
         }
@@ -505,6 +181,113 @@ public class EventJDBCDAO {Connection connection = null;
 
     }
 
+
+
+
+
+
+    public  static ObservableList<Event> insertOnlyInconsistences(TableView<Event> table,ObservableList<Event> data){
+
+        int lenght = table.getItems().size();//Numero elementi nella tabella
+        int i=1;
+
+        List list = new ArrayList();
+
+
+        while (i<lenght) {
+
+            if (Objects.equals(table.getItems().get(i).getCognome().toString(), table.getItems().get(i - 1).getCognome().toString()) &&
+                    Objects.equals(table.getItems().get(i).getData().toString(), table.getItems().get(i - 1).getData().toString()) &&
+                    Objects.equals(table.getItems().get(i).getType_id().toString(), table.getItems().get(i - 1).getType_id().toString())) {
+               // data.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+                //data.requestFocus();
+
+                System.out.println(table.getItems().get(i).getEvent_id().toString() + "   " + table.getItems().get(i - 1).getEvent_id().toString());
+
+/*
+                    String nome = data.get(i).getNome().toString();
+                    String Cognome = data.get(i).getCognome().toString();
+                    String INOUT = data.get(i).getType_id().toString();
+                    String Data = data.get(i).getData().toString();
+                    String id_event = data.get(i).getEvent_id().toString();
+
+*/
+                    //list.add(table.getItems().get(i));
+                if(!list.contains(table.getItems().get(i-1))){
+                //if(table.getItems().get(i-1).getEvent_id()!=table.getItems().get(i).getEvent_id() ){
+                    list.add(table.getItems().get(i-1));
+
+                    //list.add(table.getItems().get(i+1));
+                    list.add(table.getItems().get(i));}
+//                System.out.println(list.get(i).toString());
+
+                   // list.add(new Event(Cognome,nome,Data,INOUT,id_event));
+                //System.out.println(Cognome+" " +nome+" " +Data+" " +INOUT+" " +id_event);
+/*
+                    String nome1 = data.get(i+1).getNome().toString();
+                    String Cognome1 = data.get(i+1).getCognome().toString();
+                    String INOUT1 = data.get(i+1).getType_id().toString();
+                    String Data1 = data.get(i+1).getData().toString();
+                    String id_event1 = data.get(i+1).getEvent_id().toString();
+                    list.add(new Event(Cognome1,nome1,Data1,INOUT1,id_event1));
+                    System.out.println(Cognome1+" " +nome1+" " +Data1+" " +INOUT1+" " +id_event1);
+
+                //table.getSelectionModel().select(data.get(i));
+                //table.getSelectionModel().select(data.get(i + 1));
+
+
+                //table.getSelectionModel().focus(4);
+
+              //  System.out.println(list.get(i).toString());
+
+                //table.getItems().
+                //  System.out.println("I:"+i+" J:"+ j +"DataA: "+table.getItems().get(i).getCognome().toString() +"DataB: "+table.getItems().get(i).getData().toString()+" + "+ table.getItems().get(j).getCognome().toString()+" "+table.getItems().get(j).getData().toString());
+                */
+            }
+            i++;
+
+
+
+        }
+
+
+        return  FXCollections.observableList(list);
+
+    }
+
+    public  static ObservableList<Event> insertOnlyInconsistences(ObservableList<Event> data){
+
+        int lenght = data.size();//Numero elementi nella tabella
+        int i=1;
+
+        List list = new ArrayList();
+
+
+        while (i<lenght) {
+
+            if (Objects.equals(data.get(i).getCognome().toString(), data.get(i - 1).getCognome().toString()) &&
+                    Objects.equals(data.get(i).getData().toString(), data.get(i - 1).getData().toString()) &&
+                    Objects.equals(data.get(i).getType_id().toString(), data.get(i - 1).getType_id().toString())) {
+
+                System.out.println(data.get(i).getEvent_id().toString() + "   " + data.get(i - 1).getEvent_id().toString());
+
+                if(!list.contains(data.get(i - 1))){
+
+                    list.add(data.get(i - 1));
+
+                    list.add(data.get(i));}
+//
+            }
+            i++;
+
+
+
+        }
+
+
+        return  FXCollections.observableList(list);
+
+    }
 
 
 }
