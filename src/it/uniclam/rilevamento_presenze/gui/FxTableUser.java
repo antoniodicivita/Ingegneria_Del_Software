@@ -211,7 +211,7 @@ public class FxTableUser
         Button detailsbtn=new Button("Dettagli Eventi");
         detailsbtn.setOnAction(new DetailshButtonListener());
         Button backbtn=new Button("Annulla");
-        backbtn.setOnAction(new SearchButtonListener());
+        backbtn.setOnAction(new BackButtonListener());
         Button discrepancybtn=new Button("Incongruenze");//InCONGRUENZE
 
         discrepancybtn.setOnAction(new discrepancyButtonListener());
@@ -513,6 +513,18 @@ generatePDF.main(null);
 
 
 /*************************/
+        }//Fine Handle()
+    }//Fine search listner button
+
+    private class BackButtonListener implements EventHandler<ActionEvent> {
+
+        @Override
+        public void handle(ActionEvent e) {
+        buttonHb.setVisible(true);
+        buttonHbONE.setVisible(false);
+            buttonHbTWO.setVisible(false);
+            TextboxInsertPK.setVisible(false);
+
         }//Fine Handle()
     }//Fine search listner button
 

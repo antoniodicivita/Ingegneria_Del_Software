@@ -35,10 +35,9 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+/*GUI che si occupa della gestione delle incongruenze (doppie entrate/uscite).*/
 
-
-public class FxTableEvent
-		extends Application implements Runnable{
+public class FxTableEvent extends Application {
 
     /*CONNE DB*/
 
@@ -70,29 +69,19 @@ public class FxTableEvent
     public String datafinale = "";
     public DatePicker dataInizialeTextBox;
     public DatePicker dataFinaleTextBox;
-    @Override
-    public void run(){
-        Application.launch(FxTableEvent.class);
-    }
+
 
 	public static void main(String [] args) {
 
 		Application.launch(args);
 	}
 
-    public void initRootLayout() {
-        // Load root layout from fxml file.
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(FxTableEvent.class.getResource("TESTaddress/view/RootLayout.fxml"));
-        
-    }
+
 
 	@Override
 	public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
 		primaryStage.setTitle("Pannello di Controllo:Responsabile Presenze");
-       // initRootLayout();
-		// Users label
 
 		Label label = new Label("INCONGRUENZE");
         LabelSearch=new Label("CERCA");
@@ -250,17 +239,11 @@ public class FxTableEvent
 			new RowSelectChangeListener());
 
 
-        /********************************/
-
-
-
-        /********************************/
-
-		// Add and delete buttons
+		// Aggiunge
 		Button backbtn = new Button("Indietro");
 		backbtn.setOnAction(new BackButtonListener());
-		Button delbtn = new Button("Elimina");
-		delbtn.setOnAction(new DeleteButtonListener());
+		Button exitbtn = new Button("Esci");
+		exitbtn.setOnAction(new ExitButtonListener());
         Button srcbtn=new Button("Trova");
         srcbtn.setOnAction(new SearchButtonListener());
 
@@ -311,7 +294,7 @@ public class FxTableEvent
 
 		buttonHb = new HBox(10);
 		buttonHb.setAlignment(Pos.CENTER);
-		buttonHb.getChildren().addAll(backbtn, delbtn);
+		buttonHb.getChildren().addAll(backbtn, exitbtn);
 
         buttonHbONE = new HBox(10);
         buttonHbONE.setAlignment(Pos.CENTER);
@@ -423,87 +406,14 @@ if (ix < data.size()) {
 
 
 
-	
-//Aggiunta di un Event alla tabella OK
-    private class AddButtonListener implements EventHandler<ActionEvent> {
-        //DynamicJDBCDAO dJD=new DynamicJDBCDAO();
-		@Override
-		public void handle(ActionEvent e) {
-
-            System.out.println(data.size());/*dJD.addEXT("ris",""),dJD.addEXT("","Bgrown")*/
-            buttonHb.setVisible(false);
-            buttonHbTWO.setVisible(true);
-            TextboxSearch.setVisible(false);
-            TextboxInsertPK.setVisible(true);
-
-
-
-        }
-	}
-
-    //Confirm Operation Button
-    private class OKButtonListener implements EventHandler<ActionEvent> {
-
-        @Override
-        public void handle(ActionEvent e) {
-
-            EventJDBCDAO lj=new EventJDBCDAO();
-           // Event dipendente = dipendente =new Event("",TextboxInsertPK.getText(),1);
-           // data.add(dipendente);
-
-            int row = data.size() - 1;
-            System.out.println(data.size());
-            // Select the new row
-            table.requestFocus();
-            table.getSelectionModel().select(row);
-            table.getFocusModel().focus(row);
-            lj.addList(Server.QUERY_ADD_LIST,TextboxInsertPK.getText());
-
-            //actionStatus.setText("Nuovo Event: Inserisci nome e cognome. Prmere <Enter>.");
-            buttonHbTWO.setVisible(false);
-            buttonHb.setVisible(true);
-            TextboxInsertPK.setVisible(false);
-            TextboxSearch.setVisible(true);
-
-
-        }
-    }
 
     //(DELETE)Cancellazione elementi dalla tabella e dal DB
-	private class DeleteButtonListener implements EventHandler<ActionEvent> {
-EventJDBCDAO lj=new EventJDBCDAO();
+	private class ExitButtonListener implements EventHandler<ActionEvent> {
+
 		@Override
 		public void handle(ActionEvent e) {
+        System.exit(0);
 
-			// Get selected row and delete
-			int ix = table.getSelectionModel().getSelectedIndex();
-			Event dipendente = (Event) table.getSelectionModel().getSelectedItem();
-            System.out.println(table.getItems().get(ix).toString());
-
-            //System.out.println(table.getItems().get(ix).getTitle().toString());//Titolo X selezionato OK
-            //System.out.println(table.getItems().get(ix).getAuthor().toString());//Autore X selezionato OK
-            String titolo=table.getItems().get(ix).getNome().toString();
-            String autore=table.getItems().get(ix).getData().toString();
-            data.remove(ix);//Elimino l'elemento dalla tabella e la aggiorno
-           // lj.removeList(Server.QUERY_REMOVE_LIST,titolo,autore);
-            actionStatus.setText("Cancellato: " + dipendente.toString());
-
-			// Select a row
-
-			if (table.getItems().size() == 0) {
-
-				actionStatus.setText("Nessun record Trovato !");
-				return;
-			}
-
-			if (ix != 0) {
-
-				ix = ix -1;
-			}
-
-			table.requestFocus();
-			table.getSelectionModel().select(ix);
-			table.getFocusModel().focus(ix);
 		}
 	}
 
