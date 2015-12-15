@@ -1,6 +1,5 @@
-package it.uniclam.rilevamento_presenze.jdbcdao;
+package it.uniclam.rilevamento_presenze.controls;
 
-import it.uniclam.rilevamento_presenze.beanclass.*;
 import it.uniclam.rilevamento_presenze.connections.ConnectionDB;
 import it.uniclam.rilevamento_presenze.connections.Server;
 import javafx.collections.FXCollections;
@@ -9,8 +8,6 @@ import it.uniclam.rilevamento_presenze.beanclass.Event;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableView;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

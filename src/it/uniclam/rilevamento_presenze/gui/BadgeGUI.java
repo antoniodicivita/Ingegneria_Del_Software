@@ -6,18 +6,14 @@ package it.uniclam.rilevamento_presenze.gui;
 //import it.uniclam.rilevamento_presenze.JDBCDataAccessObject.UtenteJDBCDAO;
 //import it.uniclam.rilevamento_presenze.beanclass.UtenteBean;
 import it.uniclam.rilevamento_presenze.connections.Server;
-import it.uniclam.rilevamento_presenze.jdbcdao.Sensore;
+import it.uniclam.rilevamento_presenze.controls.Sensore;
 import it.uniclam.rilevamento_presenze.utility.Time;
-import it.uniclam.rilevamento_presenze.jdbcdao.DipendenteJDBCDAO;
+import it.uniclam.rilevamento_presenze.controls.DipendenteJDBCDAO;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.net.UnknownHostException;
 
 /**
@@ -146,20 +142,13 @@ public class BadgeGUI extends JFrame implements ActionListener {
 
         DipendenteJDBCDAO amicoDB=new DipendenteJDBCDAO();
         Sensore sensore = new Sensore();
-        //UtenteBean amicoClass=new UtenteBean();
-        //EventJDBCDAO eventDB=new EventJDBCDAO();
 
         Time time = new Time();
 
         int type_event=0;
 
 
-        //Return_ID_User=amicoDB.SELECT_NameSurname(TextBoxNome.getText(), TextBoxCognome.getText(), TextBoxCodice.getText());
-         Return_ID_User = Sensore.SELECT_NameSurname(Server.QUERY_RETURN_ID,TextBoxNome.getText(), TextBoxCognome.getText(), TextBoxCodice.getText());
-
-        //String id =TextBoxCodice.getText();
-        //Return_ID_User = Integer.parseInt(id);
-//        Return_ID_User =Sensore.SELECT_NameSurname(Server.QUERY_RETURN_ID,TextBoxNome.getText(), TextBoxCognome.getText(), TextBoxCodice.getText());
+        Return_ID_User = Sensore.SELECT_NameSurname(Server.QUERY_RETURN_ID,TextBoxNome.getText(), TextBoxCognome.getText(), TextBoxCodice.getText());
 
         if (e.getSource()==ButtonBADGE_IN){
 
@@ -229,27 +218,13 @@ public class BadgeGUI extends JFrame implements ActionListener {
 
     public static void main(String[] args) throws UnknownHostException,
             IOException {
+
         BadgeGUI user=new BadgeGUI();
         FxTableUser.main(args);
         user.setVisible(true);
-//Orologio.main(args);
+
 
         user.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-       /* AmicoJDBCDAO amicoDB=new AmicoJDBCDAO();
-        AmicoBean amicoClass=new AmicoBean();
-        Scanner sc = new Scanner(System.in);
-
-        System.out.print("Premi invio per continuare. ");
-        sc.nextLine();
-        amicoClass.setCognome(user.TextBoxCognome.getText());
-        amicoClass.setNome(user.TextBoxNome.getText());
-        amicoClass.setCodice(user.TextBoxCodice.getText());
-        //EMAIL mancante
-
-        amicoDB.add(amicoClass);
-
-        amicoDB.findAll();*/
-
 
 
 

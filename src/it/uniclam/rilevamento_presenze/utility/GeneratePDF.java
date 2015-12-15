@@ -11,13 +11,11 @@ import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.html.simpleparser.TableWrapper;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import it.uniclam.rilevamento_presenze.connections.ConnectionDB;
 import it.uniclam.rilevamento_presenze.connections.Server;
-import it.uniclam.rilevamento_presenze.jdbcdao.DipendenteJDBCDAO;
 
 import javax.swing.*;
 

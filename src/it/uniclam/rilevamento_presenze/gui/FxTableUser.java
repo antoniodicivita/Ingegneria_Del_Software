@@ -5,11 +5,14 @@ import it.uniclam.rilevamento_presenze.connections.ConnectionDB;
 
 import it.uniclam.rilevamento_presenze.connections.Server;
 import it.uniclam.rilevamento_presenze.beanclass.Dipendente;
-import it.uniclam.rilevamento_presenze.jdbcdao.DipendenteJDBCDAO;
+import it.uniclam.rilevamento_presenze.controls.DipendenteJDBCDAO;
+import it.uniclam.rilevamento_presenze.utility.GeneratePDF;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -30,6 +33,10 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import javax.swing.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.*;
 
 
@@ -44,7 +51,7 @@ public class FxTableUser
     public TextField TextboxSearch;
     public Label LabelSearch;
     public TextField TextboxInsertPK;
-
+    public FxTableEvent fx = new FxTableEvent();
     public HBox buttonHb,buttonHbONE,buttonHbTWO;
 
 
@@ -56,7 +63,9 @@ public class FxTableUser
     }
     /*FINE Conn DB*/
 
-    public FxTableUser(){}
+    public FxTableUser(){
+
+    }
     private TableView<Dipendente> table;
 	private ObservableList<Dipendente> data;
 	private Text actionStatus;
@@ -64,6 +73,7 @@ public class FxTableUser
 	public static void main(String [] args) {
 
         Application.launch(args);
+
 
     }
 	@Override
@@ -203,9 +213,14 @@ public class FxTableUser
         Button backbtn=new Button("Annulla");
         backbtn.setOnAction(new SearchButtonListener());
         Button discrepancybtn=new Button("Incongruenze");//InCONGRUENZE
+
         discrepancybtn.setOnAction(new discrepancyButtonListener());
         Button infobtn=new Button("Info Dipendenti");//InCONGRUENZE
         infobtn.setOnAction(new infoEmployeeButtonListener());
+        Button pdfreportbtn=new Button("Genera Report");//InCONGRUENZE
+        pdfreportbtn.setOnAction(new PdfReportButtonListener());
+
+
 
         //Textbox
 
@@ -217,8 +232,7 @@ public class FxTableUser
 
 		buttonHb = new HBox(10);
 		buttonHb.setAlignment(Pos.CENTER);
-		buttonHb.getChildren().addAll(addbtn, delbtn,detailsbtn,discrepancybtn,infobtn);
-
+		buttonHb.getChildren().addAll(addbtn, delbtn,detailsbtn,discrepancybtn,infobtn,pdfreportbtn);
         buttonHbONE = new HBox(10);
         buttonHbONE.setAlignment(Pos.CENTER);
         buttonHbONE.getChildren().addAll(LabelSearch, TextboxSearch, srcbtn);
@@ -427,47 +441,24 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
     }//Fine search listner button
 
 //Incongruenze
-    private class discrepancyButtonListener implements EventHandler<ActionEvent> {
+    public class discrepancyButtonListener implements EventHandler<ActionEvent> {
         DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
+    FxTableEvent c = new FxTableEvent();
         @Override
         public void handle(ActionEvent e) {
 
+            try {
+                String line = null;
+                Process p = Runtime.getRuntime().exec
+                        ("\"C:\\Program Files\\Java\\jdk1.8.0_60\\bin\\java\" -Didea.launcher.port=7534 \"-Didea.launcher.bin.path=C:\\Program Files (x86)\\JetBrains\\IntelliJ IDEA 14.0.3\\bin\" -Dfile.encoding=UTF-8 -classpath \"C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\charsets.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\deploy.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\javaws.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\jce.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\jfr.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\jfxswt.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\jsse.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\management-agent.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\plugin.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\resources.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\rt.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\access-bridge-64.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\cldrdata.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\dnsns.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\jaccess.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\jfxrt.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\localedata.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\nashorn.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\sunec.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\sunjce_provider.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\sunmscapi.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\sunpkcs11.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\zipfs.jar;C:\\Users\\Antonio Di Civita\\Desktop\\java\\Ingegneria Del Software\\out\\production\\Ingegneria Del Software;C:\\Users\\Antonio Di Civita\\Desktop\\java\\Ingegneria Del Software\\mysql-connector-java-5.1.37-bin.jar;C:\\Users\\Antonio Di Civita\\Desktop\\java\\Ingegneria Del Software\\itextpdf-5.2.1.jar;C:\\Program Files (x86)\\JetBrains\\IntelliJ IDEA 14.0.3\\lib\\idea_rt.jar\" com.intellij.rt.execution.application.AppMain it.uniclam.rilevamento_presenze.gui.FxTableEvent");
 
-// Get selected row and delete
-            int ix = table.getSelectionModel().getSelectedIndex();
-            Dipendente dipendente = (Dipendente) table.getSelectionModel().getSelectedItem();
-            System.out.println(table.getItems().get(ix).toString());
-
-            //System.out.println(table.getItems().get(ix).getTitle().toString());//Titolo X selezionato OK
-            //System.out.println(table.getItems().get(ix).getAuthor().toString());//Autore X selezionato OK
-            String nome=table.getItems().get(ix).getNome().toString();
-            String cognome=table.getItems().get(ix).getCognome().toString();
-
-            lj.MySQL_GridView(Server.QUERY_ORDERDATE,nome, cognome);
-
-
-            actionStatus.setText("Dipendente: " + dipendente.toString());
-
-
-            // Select a row
-
-            if (table.getItems().size() == 0) {
-
-                actionStatus.setText("Nessun record Trovato !");
-                return;
+            } catch (IOException e1) {
+                e1.printStackTrace();
             }
-
-            if (ix != 0) {
-
-                ix =ix;
-            }
-
-            table.requestFocus();
-            table.getSelectionModel().select(ix);
-            table.getFocusModel().focus(ix);
-
 /*************************/
         }//Fine Handle()
+
+
     }//Fine search listner button
 
     private class infoEmployeeButtonListener implements EventHandler<ActionEvent> {
@@ -476,13 +467,12 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
         public void handle(ActionEvent e) {
 
 
-// Get selected row and delete
+
             int ix = table.getSelectionModel().getSelectedIndex();
             Dipendente dipendente = (Dipendente) table.getSelectionModel().getSelectedItem();
             System.out.println(table.getItems().get(ix).toString());
 
-            //System.out.println(table.getItems().get(ix).getTitle().toString());//Titolo X selezionato OK
-            //System.out.println(table.getItems().get(ix).getAuthor().toString());//Autore X selezionato OK
+
             String nome=table.getItems().get(ix).getNome().toString();
             String cognome=table.getItems().get(ix).getCognome().toString();
 
@@ -513,43 +503,19 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
     }//Fine search listner button
 
 
+    private class PdfReportButtonListener implements EventHandler<ActionEvent> {
+        GeneratePDF generatePDF = new GeneratePDF();
+        @Override
+        public void handle(ActionEvent e) {
+
+generatePDF.main(null);
+// Get
 
 
-    //TEMP
+/*************************/
+        }//Fine Handle()
+    }//Fine search listner button
 
-    /*
-    public void update(String stringa1,String stringa2,String id) {
-        Connection connection = null;
-        PreparedStatement ptmt = null,ptmt2 = null;
-        ResultSet resultSet = null;
-        try {
-            String queryString = "UPDATE user SET Cognome=?,Nome=? WHERE ID_User='"+id+"'";
-            connection = getConnection();
-            ptmt = connection.prepareStatement(queryString);
-            ptmt.setString(1, stringa1);
-            ptmt.setString(2, stringa2);
-
-            //ptmt.setString(2, UtenteBean.getTelefono());
-            ptmt.executeUpdate();
-            System.out.println("Aggiornamento OK");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (ptmt != null)
-                    ptmt.close();
-                if (connection != null)
-                    connection.close();
-            }
-
-            catch (SQLException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-
-            }
-        }
-    }*/
 
 
 }

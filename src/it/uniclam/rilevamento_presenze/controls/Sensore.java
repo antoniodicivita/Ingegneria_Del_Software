@@ -1,16 +1,12 @@
-package it.uniclam.rilevamento_presenze.jdbcdao;
+package it.uniclam.rilevamento_presenze.controls;
 
 import it.uniclam.rilevamento_presenze.connections.Server;
 
-import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 /**
  * Created by Antonio on 05/12/2015.

@@ -1,4 +1,4 @@
-package it.uniclam.rilevamento_presenze.jdbcdao;
+package it.uniclam.rilevamento_presenze.controls;
 
 import it.uniclam.rilevamento_presenze.connections.ConnectionDB;
 

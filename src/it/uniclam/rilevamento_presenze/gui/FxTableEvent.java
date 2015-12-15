@@ -3,7 +3,7 @@ package it.uniclam.rilevamento_presenze.gui;
 import it.uniclam.rilevamento_presenze.beanclass.Event;
 import it.uniclam.rilevamento_presenze.connections.ConnectionDB;
 import it.uniclam.rilevamento_presenze.connections.Server;
-import it.uniclam.rilevamento_presenze.jdbcdao.EventJDBCDAO;
+import it.uniclam.rilevamento_presenze.controls.EventJDBCDAO;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -38,7 +38,7 @@ import java.util.*;
 
 
 public class FxTableEvent
-		extends Application {
+		extends Application implements Runnable{
 
     /*CONNE DB*/
 
@@ -49,7 +49,6 @@ public class FxTableEvent
     public TextField TextboxInsertPK;
 
     public HBox buttonHb,buttonHbONE,buttonHbTWO;
-
 
 
     private Connection getConnection() throws SQLException {
@@ -71,6 +70,11 @@ public class FxTableEvent
     public String datafinale = "";
     public DatePicker dataInizialeTextBox;
     public DatePicker dataFinaleTextBox;
+    @Override
+    public void run(){
+        Application.launch(FxTableEvent.class);
+    }
+
 	public static void main(String [] args) {
 
 		Application.launch(args);
@@ -80,12 +84,7 @@ public class FxTableEvent
         // Load root layout from fxml file.
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(FxTableEvent.class.getResource("TESTaddress/view/RootLayout.fxml"));
-        // rootLayout = (BorderPane) loader.load();
-
-        // Show the scene containing the root layout.
-       /* Scene scene = new Scene(rootLayout);
-        primaryStage.setScene(scene);
-        primaryStage.show();*/
+        
     }
 
 	@Override
@@ -603,7 +602,18 @@ EventJDBCDAO lj=new EventJDBCDAO();
         checkInDatePicker.setPromptText(pattern.toLowerCase());
     }
 
+    public void actionPerformed(java.awt.event.ActionEvent e) {
+
+        FxTableUser user = new FxTableUser();
+        if(e.getSource()==user.buttonHb){
+            System.out.println("oleee");
+        }
+
+    }
+
 
 
 }
+
+
 
