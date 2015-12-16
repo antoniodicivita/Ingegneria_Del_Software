@@ -1,28 +1,20 @@
 package it.uniclam.rilevamento_presenze.gui;
 
-import it.uniclam.rilevamento_presenze.connections.ConnectionDB;
-
-
+import it.uniclam.rilevamento_presenze.beanclass.Employee;
 import it.uniclam.rilevamento_presenze.connections.Server;
-import it.uniclam.rilevamento_presenze.beanclass.Dipendente;
 import it.uniclam.rilevamento_presenze.controls.DipendenteJDBCDAO;
 import it.uniclam.rilevamento_presenze.utility.GeneratePDF;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.*;
 import javafx.scene.control.TableColumn.CellEditEvent;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
@@ -33,42 +25,36 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import javax.swing.*;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.sql.*;
+
+
+/**
+ * La Classe FxTableUser
+ * 1. Svolge il ruolo di interfaccia per la tabella dei dipendenti
+ * 2. Permette al responsabile del serivizio presenze di visualizzare i dipendenti e i dettagli a loro associati
+ * 3.Interagisce con le classi Employee e DipendenteJDBCDAO
+ */
 
 
 public class FxTableUser
 		extends Application {
-//temp
 
-    /*CONNE DB*/
 
 
 
     public TextField TextboxSearch;
     public Label LabelSearch;
     public TextField TextboxInsertPK;
-    public FxTableEvent fx = new FxTableEvent();
+
     public HBox buttonHb,buttonHbONE,buttonHbTWO;
 
-
-
-    private Connection getConnection() throws SQLException {
-        Connection conn;
-        conn = ConnectionDB.getInstance().getConnection();
-        return conn;
-    }
-    /*FINE Conn DB*/
-
+    DipendenteJDBCDAO employeeObject = new DipendenteJDBCDAO();
+    private TableView<Employee> table;
+    private ObservableList<Employee> data;
+    private Text actionStatus;
     public FxTableUser(){
 
     }
-    private TableView<Dipendente> table;
-	private ObservableList<Dipendente> data;
-	private Text actionStatus;
 
 	public static void main(String [] args) {
 
@@ -96,8 +82,8 @@ public class FxTableUser
 		table = new TableView<>();
 		data = getInitialTableData();
 		table.setItems(data);
-		table.setEditable(true);
-//Vedere QUI
+        table.setEditable(true);
+
 
 
 
@@ -105,24 +91,24 @@ public class FxTableUser
 
         //II COl
 		TableColumn titleCol = new TableColumn("Cognome");
-		titleCol.setCellValueFactory(new PropertyValueFactory<Dipendente, String>("Cognome"));
-		titleCol.setCellFactory(TextFieldTableCell.forTableColumn());
-		titleCol.setOnEditCommit(new EventHandler<CellEditEvent<Dipendente, String>>() {
-			@Override
-			public void handle(CellEditEvent<Dipendente, String> t) {
-                DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
-				((Dipendente) t.getTableView().getItems().get(
-					t.getTablePosition().getRow())
-				).setCognome(t.getNewValue());
+        titleCol.setCellValueFactory(new PropertyValueFactory<Employee, String>("surname"));
+        titleCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        titleCol.setOnEditCommit(new EventHandler<CellEditEvent<Employee, String>>() {
+            @Override
+            public void handle(CellEditEvent<Employee, String> t) {
+
+                t.getTableView().getItems().get(
+                        t.getTablePosition().getRow()).setSurname(t.getNewValue());
 
                 //Modifica dei campi quando faccio invio (COLONNA 1)
                 int ix = table.getSelectionModel().getSelectedIndex();
-                Dipendente dipendente = (Dipendente) table.getSelectionModel().getSelectedItem();
+                Employee employee = table.getSelectionModel().getSelectedItem();
                 System.out.println(ix);
-                String nome=table.getItems().get(ix).getNome().toString();
-                String cognome=table.getItems().get(ix).getCognome().toString();
+                String nome = table.getItems().get(ix).getName().toString();
+                String cognome = table.getItems().get(ix).getSurname().toString();
                 String id_employee=table.getItems().get(ix).getId_employee().toString();
-                lj.update(Server.QUERY_UPDATE_LIST,cognome, nome, id_employee);
+
+                employeeObject.update(Server.QUERY_UPDATE_LIST, cognome, nome, id_employee);
                 System.out.println("Ho modificato il valore di COL 1");
 
 
@@ -130,59 +116,54 @@ public class FxTableUser
 		});
 
 		TableColumn authorCol = new TableColumn("Nome");
-		authorCol.setCellValueFactory(new PropertyValueFactory<Dipendente, String>("Nome"));
-		authorCol.setCellFactory(TextFieldTableCell.forTableColumn());
-		authorCol.setOnEditCommit(new EventHandler<CellEditEvent<Dipendente, String>>() {
-			@Override
-			public void handle(CellEditEvent<Dipendente, String> t) {
-	DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
-            ((Dipendente) t.getTableView().getItems().get(
-                            t.getTablePosition().getRow())
-            ).setNome(t.getNewValue());
+        authorCol.setCellValueFactory(new PropertyValueFactory<Employee, String>("name"));
+        authorCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        authorCol.setOnEditCommit(new EventHandler<CellEditEvent<Employee, String>>() {
+            @Override
+            public void handle(CellEditEvent<Employee, String> t) {
+
+                t.getTableView().getItems().get(
+                        t.getTablePosition().getRow()).setName(t.getNewValue());
 
                 //Aggiorno il valore nel database INIZIO:
                 int ix = table.getSelectionModel().getSelectedIndex();
-                Dipendente dipendente = (Dipendente) table.getSelectionModel().getSelectedItem();
+                Employee employee = table.getSelectionModel().getSelectedItem();
                 System.out.println(ix);
 
 
-
-                String nome=table.getItems().get(ix).getNome().toString();
-                String cognome=table.getItems().get(ix).getCognome().toString();
+                String nome = table.getItems().get(ix).getName().toString();
+                String cognome = table.getItems().get(ix).getSurname().toString();
                 String id_employee=table.getItems().get(ix).getId_employee().toString();
-               // System.out.println(autore+"tralalal");
-                //update
-               // lj.updateList(Server.QUERY_UPDATE_LIST, nome, cognome);
+
                 //Aggiorno il valore nel database FINE:
-                lj.update(Server.QUERY_UPDATE_LIST,cognome, nome, id_employee);
-                System.out.println("Ho modificato il valore di COL 2");
+                employeeObject.update(Server.QUERY_UPDATE_LIST, cognome, nome, id_employee);
+
 			}
 		});
 
 
         //II Final
         final TableColumn employeeCol = new TableColumn("ID");
-        employeeCol.setCellValueFactory(new PropertyValueFactory<Dipendente, String>("id_employee"));
+        employeeCol.setCellValueFactory(new PropertyValueFactory<Employee, String>("id_employee"));
         employeeCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        employeeCol.setOnEditCommit(new EventHandler<CellEditEvent<Dipendente, String>>() {
+        employeeCol.setOnEditCommit(new EventHandler<CellEditEvent<Employee, String>>() {
             @Override
 
-            public void handle(CellEditEvent<Dipendente, String> t) {
+            public void handle(CellEditEvent<Employee, String> t) {
 
-                DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
-                ((Dipendente) t.getTableView().getItems().get(
-                        t.getTablePosition().getRow())
-                ).setId_employee(t.getNewValue());
+
+                t.getTableView().getItems().get(
+                        t.getTablePosition().getRow()).setId_employee(t.getNewValue());
 
                 //Modifica dei campi quando faccio invio (COLONNA 1)
                 int ix = table.getSelectionModel().getSelectedIndex();
-                Dipendente dipendente = (Dipendente) table.getSelectionModel().getSelectedItem();
+                Employee employee = table.getSelectionModel().getSelectedItem();
                 System.out.println(ix);
-                String nome=table.getItems().get(ix).getNome().toString();
-                String cognome=table.getItems().get(ix).getCognome().toString();
+                String nome = table.getItems().get(ix).getName().toString();
+                String cognome = table.getItems().get(ix).getSurname().toString();
                 String id_employee=table.getItems().get(ix).getId_employee().toString();
-                lj.update(Server.QUERY_UPDATE_LIST,cognome, nome, id_employee);
-                System.out.println("Ho modificato il valore di COL 1");
+                employeeObject.update(Server.QUERY_UPDATE_LIST, cognome, nome, id_employee);
+
 
 
             }
@@ -249,8 +230,8 @@ public class FxTableUser
 
 		// Vbox
 		VBox vbox = new VBox(20);
-		vbox.setPadding(new Insets(25, 25, 25, 25));;
-		vbox.getChildren().addAll(labelHb,buttonHbONE,table, buttonHb,buttonHbTWO,TextboxInsertPK,actionStatus);
+        vbox.setPadding(new Insets(25, 25, 25, 25));
+        vbox.getChildren().addAll(labelHb, buttonHbONE, table, buttonHb, buttonHbTWO, TextboxInsertPK, actionStatus);
 
 		// Scene
 		Scene scene = new Scene(vbox, 500, 550); // w x h
@@ -261,49 +242,46 @@ public class FxTableUser
 
 		// Select the first row
 		table.getSelectionModel().select(0);
-		Dipendente dipendente = table.getSelectionModel().getSelectedItem();
-		actionStatus.setText(dipendente.toString());
-		
-	} // start()
-	
+        Employee employee = table.getSelectionModel().getSelectedItem();
+        actionStatus.setText(employee.toString());
+
+    } // start()
+
+    //(SELECT)Lettura di tutti i dipendenti dalla tabella
+    private ObservableList<Employee> getInitialTableData() {
+
+        return employeeObject.selectList(Server.QUERY_SELECT_ALL_LIST);
+    }
+
  	private class RowSelectChangeListener implements ChangeListener<Number> {
 
 		@Override
-		public void changed(ObservableValue<? extends Number> ov, 
-				Number oldVal, Number newVal) {
+        public void changed(ObservableValue<? extends Number> ov,
+                            Number oldVal, Number newVal) {
 
 			int ix = newVal.intValue();
 
 			if ((ix < 0) || (ix >= data.size())) {
-	
+
 				return; // invalid data
 			}
 
-			Dipendente dipendente = data.get(ix);
+            Employee employee = data.get(ix);
 
 
-           actionStatus.setText(dipendente.toString());
+            actionStatus.setText(employee.toString());
 
-            System.out.println(dipendente.toString()+"toSTRING");
+
 		}
 	}
 
-	//(SELECT)Lettura di tutti i dipendenti dalla tabellaOK
-	private ObservableList<Dipendente> getInitialTableData() {
-        DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
-
-        System.out.println("Sono passato da fuori");
-
-        return lj.SELECT_List(Server.QUERY_SELECT_ALL_LIST);
-	}
-	
-//Aggiunta di un Dipendente alla tabella OK
+    //Aggiunta di un Employee alla tabella OK
     private class AddButtonListener implements EventHandler<ActionEvent> {
-        //DynamicJDBCDAO dJD=new DynamicJDBCDAO();
+
 		@Override
 		public void handle(ActionEvent e) {
 
-            System.out.println(data.size());/*dJD.addEXT("ris",""),dJD.addEXT("","Bgrown")*/
+            System.out.println(data.size());
             buttonHb.setVisible(false);
             buttonHbTWO.setVisible(true);
             TextboxSearch.setVisible(false);
@@ -317,9 +295,9 @@ public class FxTableUser
         @Override
         public void handle(ActionEvent e) {
 
-            DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
-            Dipendente dipendente = dipendente =new Dipendente("",TextboxInsertPK.getText(),"");
-            data.add(dipendente);
+            DipendenteJDBCDAO lj = new DipendenteJDBCDAO();
+            Employee employee = employee = new Employee("", TextboxInsertPK.getText(), "");
+            data.add(employee);
 
             int row = data.size() - 1;
             System.out.println(data.size());
@@ -329,7 +307,7 @@ public class FxTableUser
             table.getFocusModel().focus(row);
             lj.addList(Server.QUERY_ADD_LIST,TextboxInsertPK.getText());
 
-            //actionStatus.setText("Nuovo Dipendente: Inserisci nome e cognome. Prmere <Enter>.");
+
             buttonHbTWO.setVisible(false);
             buttonHb.setVisible(true);
             TextboxInsertPK.setVisible(false);
@@ -341,22 +319,21 @@ public class FxTableUser
 
     //(DELETE)Cancellazione elementi dalla tabella e dal DB
 	private class DeleteButtonListener implements EventHandler<ActionEvent> {
-DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
+
 		@Override
 		public void handle(ActionEvent e) {
 
 			// Get selected row and delete
 			int ix = table.getSelectionModel().getSelectedIndex();
-			Dipendente dipendente = (Dipendente) table.getSelectionModel().getSelectedItem();
+            Employee employee = table.getSelectionModel().getSelectedItem();
             System.out.println(table.getItems().get(ix).toString());
 
-            //System.out.println(table.getItems().get(ix).getTitle().toString());//Titolo X selezionato OK
-            //System.out.println(table.getItems().get(ix).getAuthor().toString());//Autore X selezionato OK
-            String titolo=table.getItems().get(ix).getNome().toString();
-            String autore=table.getItems().get(ix).getCognome().toString();
+
+            String name = table.getItems().get(ix).getName().toString();
+            String surname = table.getItems().get(ix).getSurname().toString();
             data.remove(ix);//Elimino l'elemento dalla tabella e la aggiorno
-            lj.removeList(Server.QUERY_REMOVE_LIST,titolo,autore);
-            actionStatus.setText("Cancellato: " + dipendente.toString());
+            employeeObject.removeList(Server.QUERY_REMOVE_LIST, name, surname);
+
 
 			// Select a row
 
@@ -377,20 +354,20 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
 		}
 	}
 
-    //(SEARCH)Cancellazione elementi dalla tabella e dal DB OK
+    //(SEARCH)Ricerca elementi nella tabella e dal DB OK
     private class SearchButtonListener implements EventHandler<ActionEvent> {
 
-        DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
+
         @Override
         public void handle(ActionEvent e) {
 
 
-//Elimino tutti gli elementi dalla tabella ( NON dal database)
+
             /*************************/
             table.getItems().clear();
             String value=TextboxSearch.getText();
 
-            lj.searchList(Server.QUERY_SEARCH_LIST,value,data);
+            employeeObject.searchList(Server.QUERY_SEARCH_LIST, value, data);
 
 
 
@@ -398,26 +375,26 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
         }//Fine Handle()
     }//Fine search listner button
 
+
+    //Bottone degli eventi dettagliati relativi ai dipendenti
     private class DetailshButtonListener implements EventHandler<ActionEvent> {
-DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
+
         @Override
         public void handle(ActionEvent e) {
 
 
-// Get selected row and delete
+//
             int ix = table.getSelectionModel().getSelectedIndex();
-            Dipendente dipendente = (Dipendente) table.getSelectionModel().getSelectedItem();
+            Employee employee = table.getSelectionModel().getSelectedItem();
             System.out.println(table.getItems().get(ix).toString());
 
-            //System.out.println(table.getItems().get(ix).getTitle().toString());//Titolo X selezionato OK
-            //System.out.println(table.getItems().get(ix).getAuthor().toString());//Autore X selezionato OK
-            String nome=table.getItems().get(ix).getNome().toString();
-            String cognome=table.getItems().get(ix).getCognome().toString();
+            String name = table.getItems().get(ix).getName().toString();
+            String surname = table.getItems().get(ix).getSurname().toString();
 
-            lj.MySQL_GridView(Server.QUERY_ORDERDATE, nome, cognome);
+            employeeObject.gridView(Server.QUERY_ORDERDATE, name, surname);
 
 
-            actionStatus.setText("Dipendente: " + dipendente.toString());
+            actionStatus.setText("Employee: " + employee.toString());
 
             // Select a row
 
@@ -437,49 +414,50 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
             table.getFocusModel().focus(ix);
         
 /*************************/
-        }//Fine Handle()
-    }//Fine search listner button
+        }
+    }
 
 //Incongruenze
     public class discrepancyButtonListener implements EventHandler<ActionEvent> {
-        DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
-    FxTableEvent c = new FxTableEvent();
-        @Override
+
+
+    @Override
         public void handle(ActionEvent e) {
 
             try {
-                String line = null;
-                Process p = Runtime.getRuntime().exec
+
+                Runtime.getRuntime().exec
                         ("\"C:\\Program Files\\Java\\jdk1.8.0_60\\bin\\java\" -Didea.launcher.port=7534 \"-Didea.launcher.bin.path=C:\\Program Files (x86)\\JetBrains\\IntelliJ IDEA 14.0.3\\bin\" -Dfile.encoding=UTF-8 -classpath \"C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\charsets.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\deploy.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\javaws.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\jce.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\jfr.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\jfxswt.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\jsse.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\management-agent.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\plugin.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\resources.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\rt.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\access-bridge-64.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\cldrdata.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\dnsns.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\jaccess.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\jfxrt.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\localedata.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\nashorn.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\sunec.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\sunjce_provider.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\sunmscapi.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\sunpkcs11.jar;C:\\Program Files\\Java\\jdk1.8.0_60\\jre\\lib\\ext\\zipfs.jar;C:\\Users\\Antonio Di Civita\\Desktop\\java\\Ingegneria Del Software\\out\\production\\Ingegneria Del Software;C:\\Users\\Antonio Di Civita\\Desktop\\java\\Ingegneria Del Software\\mysql-connector-java-5.1.37-bin.jar;C:\\Users\\Antonio Di Civita\\Desktop\\java\\Ingegneria Del Software\\itextpdf-5.2.1.jar;C:\\Program Files (x86)\\JetBrains\\IntelliJ IDEA 14.0.3\\lib\\idea_rt.jar\" com.intellij.rt.execution.application.AppMain it.uniclam.rilevamento_presenze.gui.FxTableEvent");
 
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
 /*************************/
-        }//Fine Handle()
+    }
 
 
-    }//Fine search listner button
+}
 
+    //Informazioni sui dipendenti
     private class infoEmployeeButtonListener implements EventHandler<ActionEvent> {
-        DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
+
         @Override
         public void handle(ActionEvent e) {
 
 
 
             int ix = table.getSelectionModel().getSelectedIndex();
-            Dipendente dipendente = (Dipendente) table.getSelectionModel().getSelectedItem();
+            Employee employee = table.getSelectionModel().getSelectedItem();
             System.out.println(table.getItems().get(ix).toString());
 
 
-            String nome=table.getItems().get(ix).getNome().toString();
-            String cognome=table.getItems().get(ix).getCognome().toString();
+            String name = table.getItems().get(ix).getName().toString();
+            String surname = table.getItems().get(ix).getSurname().toString();
 
-            lj.details(Server.QUERY_DETAILS, nome, cognome);
+            employeeObject.details(Server.QUERY_DETAILS, name, surname);
 
 
-            actionStatus.setText("Dipendente: " + dipendente.toString());
+            actionStatus.setText("Employee: " + employee.toString());
 
             // Select a row
 
@@ -499,23 +477,24 @@ DipendenteJDBCDAO lj=new DipendenteJDBCDAO();
             table.getFocusModel().focus(ix);
 
 /*************************/
-        }//Fine Handle()
-    }//Fine search listner button
+        }
+    }
 
 
+    //Generatore di report
     private class PdfReportButtonListener implements EventHandler<ActionEvent> {
         GeneratePDF generatePDF = new GeneratePDF();
         @Override
         public void handle(ActionEvent e) {
 
-generatePDF.main(null);
-// Get
+            GeneratePDF.main(null);
 
 
 /*************************/
-        }//Fine Handle()
-    }//Fine search listner button
+        }
+    }
 
+    //Bottone di ritorno
     private class BackButtonListener implements EventHandler<ActionEvent> {
 
         @Override
@@ -525,8 +504,8 @@ generatePDF.main(null);
             buttonHbTWO.setVisible(false);
             TextboxInsertPK.setVisible(false);
 
-        }//Fine Handle()
-    }//Fine search listner button
+        }
+    }
 
 
 

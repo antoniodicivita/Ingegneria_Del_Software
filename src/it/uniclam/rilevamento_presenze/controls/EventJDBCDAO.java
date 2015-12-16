@@ -1,10 +1,10 @@
 package it.uniclam.rilevamento_presenze.controls;
 
-import it.uniclam.rilevamento_presenze.connections.ConnectionDB;
+
+import it.uniclam.rilevamento_presenze.beanclass.Event;
 import it.uniclam.rilevamento_presenze.connections.Server;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import it.uniclam.rilevamento_presenze.beanclass.Event;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableView;
 
@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -21,78 +20,31 @@ import java.util.Objects;
 /**
  * Created by Chriz 7X on 06/12/2015.
  */
-public class EventJDBCDAO {Connection connection = null;
-    PreparedStatement ptmt= null;
-    ResultSet resultSet = null;
 
-    public EventJDBCDAO() {}
 
-    private Connection getConnection() throws SQLException {
-        Connection conn;
-        conn = ConnectionDB.getInstance().getConnection();
-        return conn;
+/**
+ * La Classe EventJDBCDAO:
+ * 1. Svolge il ruolo di client per FXTableEvent
+ * 2. Implementa tutti i metodi utilizzati dalla classeFxTableEvent
+ * 3.Interagisce con le classi Server e FxTableEvent
+ */
+public class EventJDBCDAO {
+
+    public EventJDBCDAO() {
     }
 
+    /**
+     * Questo metodo si occupa di effettuare la ricerca degli eventi per data
+     *
+     * @param type_query
+     * @param initialDate
+     * @param finalDate
+     * @return ObservableList<Event> data
+     */
 
+    public static ObservableList<Event> searchDate(String type_query, String initialDate, String finalDate) {
 
-
-
-    public void addList(String type_query,String valueONE){
-
-        String req= type_query +"\n" + valueONE + "\n";
-
-        try {
-            Socket s = new Socket(Server.HOST, Server.PORT);
-
-            PrintWriter out =new PrintWriter(s.getOutputStream(),true);
-            BufferedReader in= new BufferedReader(new InputStreamReader(s.getInputStream()));
-            out.println(req);
-            String line=in.readLine();
-
-            System.out.println(line);
-            s.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-
-
-
-
-
-    public void update(String type_query, String name_type, String id_event) {
-
-        //String req = "UPDATE user SET Cognome='"+valueTWO+"' WHERE Nome='"+valueONE+"'AND Cognome'"+valueTWO+"'";
-        String req = type_query +"\n" + name_type + "\n" + id_event + "\n";
-
-        try {
-            Socket s = new Socket(Server.HOST, Server.PORT);
-            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-            out.println(req);
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-
-    }
-
-
-    //OK
-
-
-
-
-    public static  ObservableList<Event> searchDate(String type_query,String datainiziale, String datafinale){
-
-        String req = type_query +"\n" + datainiziale+"\n" + datafinale +"\n";
+        String req = type_query + "\n" + initialDate + "\n" + finalDate + "\n";
 
 
 
@@ -105,21 +57,21 @@ public class EventJDBCDAO {Connection connection = null;
             BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             out.println(req);
 
-            String nome=in.readLine();
-            if(nome.equals("OK")) {
+            String name = in.readLine();
+            if (name.equals("OK")) {
 
-                while (nome.length() > 0 ) {
+                while (name.length() > 0) {
 
-                    nome = in.readLine();
-                    String Cognome = in.readLine();
-                    String INOUT = in.readLine();
-                    String Data = in.readLine();
+                    name = in.readLine();
+                    String surname = in.readLine();
+                    String inOut = in.readLine();
+                    String date = in.readLine();
                     String id_event = in.readLine();
-                   // String Ora = in.readLine();
 
-                    if(nome !=null && Cognome!=null && INOUT!=null && Data!=null&& id_event!=null){
-                    list.add(new Event(Cognome,nome,Data,INOUT,id_event));
-                        //System.out.println(Cognome+" " +nome+" " +Data+" " +INOUT+" " +id_event);
+
+                    if (name != null && surname != null && inOut != null && date != null && id_event != null) {
+                        list.add(new Event(surname, name, date, inOut, id_event));
+
                     }
 
                 }
@@ -134,19 +86,20 @@ public class EventJDBCDAO {Connection connection = null;
         ObservableList<Event> date_ordered = FXCollections.observableList(list);
 
 
-        //return date_ordered;
+
         return  insertOnlyInconsistences(date_ordered);
     }
 
+    /**
+     * Questo metodo si occupa di evidenziare le incongruenze (doppie entrate/uscite) nella tebella degli eventi
+     *
+     * @param table
+     * @param data
+     */
 
+    public static void inconsistenceSelector(TableView<Event> table, ObservableList<Event> data) {
 
-
-
-
-
-    public  static void call(TableView<Event> table, ObservableList<Event> data){
-
-        int lenght = data.size();//Numero elementi nella tabella
+        int lenght = data.size();
         int i=0;
 
 
@@ -161,12 +114,10 @@ public class EventJDBCDAO {Connection connection = null;
                 table.getSelectionModel().select(data.get(i + 1));
 
 
-                table.getSelectionModel().focus(4);
+                table.getSelectionModel().focus(0);
 
 
 
-                //table.getItems().
-                //  System.out.println("I:"+i+" J:"+ j +"DataA: "+table.getItems().get(i).getCognome().toString() +"DataB: "+table.getItems().get(i).getData().toString()+" + "+ table.getItems().get(j).getCognome().toString()+" "+table.getItems().get(j).getData().toString());
             }
             i++;
 
@@ -175,92 +126,24 @@ public class EventJDBCDAO {Connection connection = null;
         }
 
 
-
     }
 
+    /**
+     * Questo metodo si occupa di inserire solo le incongruenze nell'apposita tabella
+     *
+     * @param data
+     * @return ObservableList<Event>
+     */
 
+    public static ObservableList<Event> insertOnlyInconsistences(ObservableList<Event> data) {
 
-
-
-
-    public  static ObservableList<Event> insertOnlyInconsistences(TableView<Event> table,ObservableList<Event> data){
-
-        int lenght = table.getItems().size();//Numero elementi nella tabella
-        int i=1;
+        int lenght = data.size();
+        int i = 1;
 
         List list = new ArrayList();
 
 
-        while (i<lenght) {
-
-            if (Objects.equals(table.getItems().get(i).getCognome().toString(), table.getItems().get(i - 1).getCognome().toString()) &&
-                    Objects.equals(table.getItems().get(i).getData().toString(), table.getItems().get(i - 1).getData().toString()) &&
-                    Objects.equals(table.getItems().get(i).getType_id().toString(), table.getItems().get(i - 1).getType_id().toString())) {
-               // data.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-                //data.requestFocus();
-
-                System.out.println(table.getItems().get(i).getEvent_id().toString() + "   " + table.getItems().get(i - 1).getEvent_id().toString());
-
-/*
-                    String nome = data.get(i).getNome().toString();
-                    String Cognome = data.get(i).getCognome().toString();
-                    String INOUT = data.get(i).getType_id().toString();
-                    String Data = data.get(i).getData().toString();
-                    String id_event = data.get(i).getEvent_id().toString();
-
-*/
-                    //list.add(table.getItems().get(i));
-                if(!list.contains(table.getItems().get(i-1))){
-                //if(table.getItems().get(i-1).getEvent_id()!=table.getItems().get(i).getEvent_id() ){
-                    list.add(table.getItems().get(i-1));
-
-                    //list.add(table.getItems().get(i+1));
-                    list.add(table.getItems().get(i));}
-//                System.out.println(list.get(i).toString());
-
-                   // list.add(new Event(Cognome,nome,Data,INOUT,id_event));
-                //System.out.println(Cognome+" " +nome+" " +Data+" " +INOUT+" " +id_event);
-/*
-                    String nome1 = data.get(i+1).getNome().toString();
-                    String Cognome1 = data.get(i+1).getCognome().toString();
-                    String INOUT1 = data.get(i+1).getType_id().toString();
-                    String Data1 = data.get(i+1).getData().toString();
-                    String id_event1 = data.get(i+1).getEvent_id().toString();
-                    list.add(new Event(Cognome1,nome1,Data1,INOUT1,id_event1));
-                    System.out.println(Cognome1+" " +nome1+" " +Data1+" " +INOUT1+" " +id_event1);
-
-                //table.getSelectionModel().select(data.get(i));
-                //table.getSelectionModel().select(data.get(i + 1));
-
-
-                //table.getSelectionModel().focus(4);
-
-              //  System.out.println(list.get(i).toString());
-
-                //table.getItems().
-                //  System.out.println("I:"+i+" J:"+ j +"DataA: "+table.getItems().get(i).getCognome().toString() +"DataB: "+table.getItems().get(i).getData().toString()+" + "+ table.getItems().get(j).getCognome().toString()+" "+table.getItems().get(j).getData().toString());
-                */
-            }
-            i++;
-
-
-
-        }
-
-
-        return  FXCollections.observableList(list);
-
-    }
-
-    public  static ObservableList<Event> insertOnlyInconsistences(ObservableList<Event> data){
-
-        int lenght = data.size();//Numero elementi nella tabella
-        int i=1;
-
-        List list = new ArrayList();
-
-
-        while (i<lenght) {
+        while (i < lenght) {
 
             if (Objects.equals(data.get(i).getCognome().toString(), data.get(i - 1).getCognome().toString()) &&
                     Objects.equals(data.get(i).getData().toString(), data.get(i - 1).getData().toString()) &&
@@ -268,21 +151,96 @@ public class EventJDBCDAO {Connection connection = null;
 
                 System.out.println(data.get(i).getEvent_id().toString() + "   " + data.get(i - 1).getEvent_id().toString());
 
-                if(!list.contains(data.get(i - 1))){
+                if (!list.contains(data.get(i - 1))) {
 
                     list.add(data.get(i - 1));
 
-                    list.add(data.get(i));}
+                    list.add(data.get(i));
+                }
 //
             }
             i++;
 
 
-
         }
 
 
-        return  FXCollections.observableList(list);
+        return FXCollections.observableList(list);
+
+    }
+
+    /**
+     * Questo metodo si occupa di effettuare l'update dei campi nella tabella Eventi
+     * @param type_query
+     * @param name_type
+     * @param id_event
+     */
+
+    public void update(String type_query, String name_type, String id_event) {
+
+
+        String req = type_query + "\n" + name_type + "\n" + id_event + "\n";
+
+        try {
+            Socket s = new Socket(Server.HOST, Server.PORT);
+            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+
+            out.println(req);
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    /**
+     * Questo metodo si occupa di riempire la tabella degli eventi
+     *
+     * @param type_query
+     * @return ObservableList<Event> data
+     */
+    public ObservableList<Event> getInitialTableData(String type_query) {
+
+        String req = type_query +"\n";
+        List list = new ArrayList();
+
+
+        try {
+            Socket s = new Socket(Server.HOST, Server.PORT);
+            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            out.println(req);
+
+            String name = in.readLine();
+            if (name.equals("OK")) {
+
+                while (name.length() > 0) {
+
+                    name = in.readLine();
+                    String surname = in.readLine();
+                    String inOut = in.readLine();
+                    String date = in.readLine();
+                    String id_event = in.readLine();
+
+
+                    if (name != null && surname != null && inOut != null && date != null && id_event != null) {
+                        list.add(new Event(surname, name, date, inOut, id_event));
+
+                    }
+
+                }
+
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        ObservableList<Event> data = FXCollections.observableList(list);
+
+        return data;
 
     }
 

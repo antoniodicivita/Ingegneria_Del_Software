@@ -1,66 +1,63 @@
 package it.uniclam.rilevamento_presenze.gui;
 
 
-
-//import it.uniclam.rilevamento_presenze.JDBCDataAccessObject.EventJDBCDAO;
-//import it.uniclam.rilevamento_presenze.JDBCDataAccessObject.UtenteJDBCDAO;
-//import it.uniclam.rilevamento_presenze.beanclass.UtenteBean;
 import it.uniclam.rilevamento_presenze.connections.Server;
-import it.uniclam.rilevamento_presenze.controls.Sensore;
+import it.uniclam.rilevamento_presenze.controls.Sensor;
 import it.uniclam.rilevamento_presenze.utility.Time;
-import it.uniclam.rilevamento_presenze.controls.DipendenteJDBCDAO;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.net.UnknownHostException;
+
 
 /**
  * Created by Chriz 7X on 16/11/2015.
  */
+
+/**
+ * La Classe BadgeGUI
+ * 1. Svolge il ruolo di interfaccia utente
+ * 2. Permette ai dipendenti di effettuare l'ingresso o l'uscita
+ * 3.Interagisce con le classi Sensor e FxTableUser
+ */
+
 public class BadgeGUI extends JFrame implements ActionListener {
 
-    boolean state_TrueFalse;
+    public static int MAX_BADGE_NUM = 2;
     int Return_ID_User;
 
-    int Count;
+
 
     JPanel panel;
     JTextField NewMsg;
     //Obj Button IN
     JTextField TextBoxBADGE_IN;
-    String String_BADGE_IN="BADGE_IN SEND";
     JLabel LabelBADGE_IN;
     JButton ButtonBADGE_IN;
 
     //Obj Button IN
     JTextField TextBoxBADGE_OUT;
-    String String_BADGE_OUT="BADGE_OUT SEND";
     JLabel LabelBADGE_OUT;
     JButton ButtonBADGE_OUT;
 
     //Obj Cognome
     JTextField TextBoxCognome;
-    String String_Cognome="C1";
     JLabel LabelCognome;
     JButton ButtonCognome;
 
     //Obj Nome
     JTextField TextBoxNome;
-    String String_Nome="N1";
     JLabel LabelNome;
     JButton ButtonNome;
 
     //Obj CodiceUtente.
     JTextField TextBoxCodice;
-    String String_Codice="3T1";
     JLabel LabelCodice;
     JButton ButtonCodice;
 
 
-
-    public BadgeGUI() throws UnknownHostException, IOException{
+    public BadgeGUI() throws IOException {
         TextBoxBADGE_IN=new JTextField();
         LabelBADGE_IN=new JLabel();
         ButtonBADGE_IN=new JButton();
@@ -135,20 +132,33 @@ public class BadgeGUI extends JFrame implements ActionListener {
 
     }
 
+    public static void main(String[] args) throws
+            IOException {
 
+        BadgeGUI user = new BadgeGUI();
+        FxTableUser.main(args);
+        user.setVisible(true);
+
+
+        user.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+
+    }
 
     @Override
+
+    //Click del mouse sui pulsanti di ingresso o di uscita
     public void actionPerformed(ActionEvent e) {
 
-        DipendenteJDBCDAO amicoDB=new DipendenteJDBCDAO();
-        Sensore sensore = new Sensore();
+
+        Sensor sensor = new Sensor();
 
         Time time = new Time();
 
         int type_event=0;
 
 
-        Return_ID_User = Sensore.SELECT_NameSurname(Server.QUERY_RETURN_ID,TextBoxNome.getText(), TextBoxCognome.getText(), TextBoxCodice.getText());
+        Return_ID_User = Sensor.selectNameSurname(Server.QUERY_RETURN_ID, TextBoxNome.getText(), TextBoxCognome.getText(), TextBoxCodice.getText());
 
         if (e.getSource()==ButtonBADGE_IN){
 
@@ -158,11 +168,11 @@ public class BadgeGUI extends JFrame implements ActionListener {
 
                 if (Return_ID_User != 0) {
 
-                    int countevent_IN_OUT = sensore.countItem(Server.QUERY_COUNT_ITEM, Return_ID_User, time.getDate());
+                    int countevent_IN_OUT = Sensor.countItem(Server.QUERY_COUNT_ITEM, Return_ID_User, time.getDate());
 
-                    if (countevent_IN_OUT < 2) {
+                    if (countevent_IN_OUT < MAX_BADGE_NUM) {
 
-                        Sensore.addEvent(Server.QUERY_IN_OUT, Return_ID_User, time.getHour(), time.getDate(), type_event);
+                        Sensor.addEvent(Server.QUERY_IN_OUT, Return_ID_User, time.getHour(), time.getDate(), type_event);
 
 
 
@@ -172,13 +182,13 @@ public class BadgeGUI extends JFrame implements ActionListener {
                                 "Numero di INGRESSI superato",
                                 JOptionPane.WARNING_MESSAGE);
                     }
-                    TextBoxNome.setText(" ");
-                    TextBoxCognome.setText(" ");
-                    TextBoxCodice.setText(" ");
+                    //TextBoxNome.setText(" ");
+                    //TextBoxCognome.setText(" ");
+                    //TextBoxCodice.setText(" ");
 
 
                 } else {
-                    //System.out.println("False");
+
                     System.out.println(Return_ID_User);
                 }
 
@@ -187,47 +197,30 @@ public class BadgeGUI extends JFrame implements ActionListener {
         else if (e.getSource()==ButtonBADGE_OUT){
 
             type_event = 2;
-          //  Return_ID_User = Sensore.SELECT_NameSurname(Server.QUERY_RETURN_ID,TextBoxNome.getText(), TextBoxCognome.getText(), TextBoxCodice.getText());
+
 
             if (Return_ID_User!=0) {
 
-                int countevent_IN_OUT = Sensore.countItem(Server.QUERY_COUNT_ITEM, Return_ID_User, time.getDate());
+                int countevent_IN_OUT = Sensor.countItem(Server.QUERY_COUNT_ITEM, Return_ID_User, time.getDate());
 
 
-                if (countevent_IN_OUT < 2) {
+                if (countevent_IN_OUT < MAX_BADGE_NUM) {
 
-                    Sensore.addEvent(Server.QUERY_IN_OUT,Return_ID_User, time.getHour(), time.getDate(), type_event);
+                    Sensor.addEvent(Server.QUERY_IN_OUT, Return_ID_User, time.getHour(), time.getDate(), type_event);
 
                 } else {
-                    System.out.println("Dipendente non INSERITO nel DB");
+
                     JOptionPane.showMessageDialog(this,
                             "Dipendente NON inserito",
                             "Numero di INGRESSI/USCITE superato",
                             JOptionPane.WARNING_MESSAGE);}
-                    TextBoxNome.setText(" ");
-                    TextBoxCognome.setText(" ");
-                    TextBoxCodice.setText(" ");
+                //TextBoxNome.setText(" ");
+                //TextBoxCognome.setText(" ");
+                //TextBoxCodice.setText(" ");
 
 
-            }else {
-                System.out.println("Dipendente non INSERITO nel DB");}
+            }
         }
-
-    }
-
-
-    public static void main(String[] args) throws UnknownHostException,
-            IOException {
-
-        BadgeGUI user=new BadgeGUI();
-        FxTableUser.main(args);
-        user.setVisible(true);
-
-
-        user.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-
-
 
     }
 

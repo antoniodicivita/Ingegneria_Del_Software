@@ -7,17 +7,21 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.*;
-import java.util.GregorianCalendar;
 
-//import it.uniclam.rilevamento_presenze.JDBCDataAccessObject.EventJDBCDAO;
+
 /**
  * Created by Antonio on 30/11/2015.
  */
+
+/**
+ * La classe Server:
+ * 1. si occupa di interagire con il database per l'esecuzione delle query
+ * 2. si occupa di rispondere alle richieste del client
+ * 3. interagisce con le classi DipendenteJDBCDAO, EventJDBCDAO e Sensor
+ */
+
 public class Server {
 
-
-    private static Connection connection;
-    private static PreparedStatement ptmt;
 
     public static String HOST = "127.0.0.1";
     public static int PORT = 5555;
@@ -35,7 +39,9 @@ public class Server {
     public static String QUERY_CREATE_YEAR_REPORT = "req_create_year_report";
     public static String QUERY_UPDATE_EVENT = "req_update_event";
     public static String QUERY_DATE_SEARCH = "req_date_search";
-
+    public static String QUERY_SELECT_ALL_EVENT = "req_select_all_event";
+    private static Connection connection;
+    private static PreparedStatement ptmt;
 
     public static void main(String[] args) {
 
@@ -78,12 +84,12 @@ public class Server {
 
                     else if (command.equals(QUERY_RETURN_ID)) {
 
-                        String nome = in.readLine().replace("name", "");
-                        String cognome = in.readLine().replace("surname", "");
+                        String name = in.readLine().replace("name", "");
+                        String surname = in.readLine().replace("surname", "");
                         String id = in.readLine().replace("id_user", "");
 
 
-                        String query = "SELECT Nome, Cognome, ID_User FROM user WHERE Cognome='"+cognome+"'AND Nome='"+nome+"' OR ID_User='"+id+"' ";
+                        String query = "SELECT Nome, Cognome, ID_User FROM user WHERE Cognome='" + surname + "'AND Nome='" + name + "' OR ID_User='" + id + "' ";
                         String count = retId(query);
 
                         outchannel.println(count);
@@ -94,10 +100,10 @@ public class Server {
                     else if (command.equals(QUERY_ORDERDATE)){
 
 
-                        String nome = in.readLine().replace("nome", "");
-                        String cognome = in.readLine().replace("cognome", "");
+                        String name = in.readLine().replace("nome", "");
+                        String surname = in.readLine().replace("cognome", "");
 
-                        String query = "SELECT  Nome,Cognome, Name_Type, Data,Hour FROM (type JOIN event ON Type_ID=ID_Type) JOIN user ON User_ID=ID_User WHERE Nome='"+nome+"' AND Cognome='"+cognome+"' ORDER BY (str_to_date(Data, '%d%b%Y')) DESC  , (str_to_date(Hour, '%H:%i:%s')) DESC";
+                        String query = "SELECT  Nome,Cognome, Name_Type, Data,Hour FROM (type JOIN event ON Type_ID=ID_Type) JOIN user ON User_ID=ID_User WHERE Nome='" + name + "' AND Cognome='" + surname + "' ORDER BY (str_to_date(Data, '%d%b%Y')) DESC  , (str_to_date(Hour, '%H:%i:%s')) DESC";
 
                         String out = orderByDate(query);
 
@@ -109,10 +115,10 @@ public class Server {
                     else if (command.equals(QUERY_DATE_SEARCH)){
 
 
-                        String datainiziale = in.readLine();
-                        String datafinale = in.readLine();
+                        String initialdate = in.readLine();
+                        String finaldate = in.readLine();
 
-                        String query = "SELECT Cognome, Nome, Data, Name_Type, ID_Event FROM (event JOIN type ON Type_ID = ID_Type) JOIN user ON User_ID=ID_User WHERE (str_to_date(Data, '%d%b%Y')) >= '" + datainiziale + "' AND (str_to_date(Data, '%d%b%Y')) <= '" + datafinale+"' ORDER BY  (str_to_date(Data, '%d%b%Y')) DESC, User_ID";
+                        String query = "SELECT Cognome, Nome, Data, Name_Type, ID_Event FROM (event JOIN type ON Type_ID = ID_Type) JOIN user ON User_ID=ID_User WHERE (str_to_date(Data, '%d%b%Y')) >= '" + initialdate + "' AND (str_to_date(Data, '%d%b%Y')) <= '" + finaldate + "' ORDER BY  (str_to_date(Data, '%d%b%Y')) DESC, User_ID";
                         String out = searchDate(query);
 
 
@@ -152,8 +158,8 @@ public class Server {
                     else if(command.equals(QUERY_SEARCH_LIST)){
 
 
-                        String chiavericerca = in.readLine().replace("chiavericerca", "");
-                        String query = "SELECT * FROM user WHERE Cognome LIKE  '" + chiavericerca + "%'OR Nome LIKE '" + chiavericerca + "%'";
+                        String keySearch = in.readLine().replace("chiavericerca", "");
+                        String query = "SELECT * FROM user WHERE Cognome LIKE  '" + keySearch + "%'OR Nome LIKE '" + keySearch + "%'";
                         String out = searchList(query);
                         outchannel.println(out);
 
@@ -166,10 +172,10 @@ public class Server {
 
                     else if(command.equals(QUERY_UPDATE_LIST)){
 
-                        String nome = in.readLine().replace("valueONE", "");
-                        String cognome = in.readLine().replace("valueTWO", "");
+                        String name = in.readLine().replace("valueONE", "");
+                        String surname = in.readLine().replace("valueTWO", "");
                         String id = in.readLine().replace("id", "");
-                        String query = "UPDATE user SET Cognome='"+cognome+"', Nome='"+nome+"' WHERE ID_User='"+id+"'";
+                        String query = "UPDATE user SET Cognome='" + surname + "', Nome='" + name + "' WHERE ID_User='" + id + "'";
                         String out = standardQueryExecutor(query);
                         outchannel.println(out);
                         s.close();
@@ -177,12 +183,10 @@ public class Server {
 
                     else if(command.equals(QUERY_UPDATE_EVENT)){
 
-                       // String event = in.readLine().replace("event", "");
-
                         String id_type = in.readLine();
                         String id_event = in.readLine();
                         String query = "UPDATE event SET Type_ID ='"+id_type+"' WHERE ID_Event='"+id_event+"'";
-                        //String query = "UPDATE event SET Type_ID ='2' WHERE ID_Event='238'";
+
                         String out = standardQueryExecutor(query);
                         outchannel.println(out);
                         s.close();
@@ -190,9 +194,9 @@ public class Server {
 
                     else if(command.equals(QUERY_CREATE_MONTH_REPORT)){
 
-                        String mese = in.readLine();
-                        String anno = in.readLine();
-                        String query = "SELECT Nome,Cognome,Name_Type,Data,Hour FROM (type JOIN event ON Type_ID=ID_Type) JOIN user ON User_ID=ID_User  WHERE YEAR(str_to_date(Data,'%d%b%Y')) = '" + anno +"' AND MONTH(str_to_date(Data,'%d%b%Y')) = '"+ mese+"' ORDER BY (str_to_date(Data, '%d%b%Y')) DESC" ;
+                        String month = in.readLine();
+                        String year = in.readLine();
+                        String query = "SELECT Nome,Cognome,Name_Type,Data,Hour FROM (type JOIN event ON Type_ID=ID_Type) JOIN user ON User_ID=ID_User  WHERE YEAR(str_to_date(Data,'%d%b%Y')) = '" + year + "' AND MONTH(str_to_date(Data,'%d%b%Y')) = '" + month + "' ORDER BY (str_to_date(Data, '%d%b%Y')) DESC";
                         String out = createReport(query);
                         outchannel.println(out);
                         s.close();
@@ -200,9 +204,9 @@ public class Server {
 
                     else if(command.equals(QUERY_CREATE_YEAR_REPORT)){
 
-                        String mese = in.readLine();
-                        String anno = in.readLine();
-                        String query = "SELECT Nome,Cognome,Name_Type,Data,Hour FROM (type JOIN event ON Type_ID=ID_Type) JOIN user ON User_ID=ID_User  WHERE YEAR(str_to_date(Data,'%d%b%Y')) = '" + anno +"'ORDER BY (str_to_date(Data, '%d%b%Y')) DESC" ;
+
+                        String year = in.readLine();
+                        String query = "SELECT Nome,Cognome,Name_Type,Data,Hour FROM (type JOIN event ON Type_ID=ID_Type) JOIN user ON User_ID=ID_User  WHERE YEAR(str_to_date(Data,'%d%b%Y')) = '" + year + "'ORDER BY (str_to_date(Data, '%d%b%Y')) DESC";
                         String out = createReport(query);
                         outchannel.println(out);
                         s.close();
@@ -211,17 +215,27 @@ public class Server {
                     else if(command.equals(QUERY_DETAILS)){
 
 
-                        String nome = in.readLine().replace("nome", "");
-                        String cognome = in.readLine().replace("cognome", "");
+                        String name = in.readLine().replace("nome", "");
+                        String surname = in.readLine().replace("cognome", "");
 
-                        String query = "SELECT Nome, Cognome, Orari, Pausa_pranzo, Straordinario FROM user WHERE Nome='"+ nome + "' AND Cognome='" + cognome+"'";
+                        String query = "SELECT Nome, Cognome, Orari, Pausa_pranzo, Straordinario FROM user WHERE Nome='" + name + "' AND Cognome='" + surname + "'";
 
                         String out = details(query);
 
 
                         outchannel.println(out);
                         s.close();
+                    } else if (command.equals(QUERY_SELECT_ALL_EVENT)) {
+
+
+                        String query = "SELECT event.Data, Nome, Cognome, Name_Type,ID_Event FROM (event  JOIN user ON User_ID=ID_User) JOIN type ON Type_ID=ID_Type  ORDER BY STR_TO_DATE(Data, '%d%b%Y') DESC, User_ID";
+                        String out = searchDate(query);
+
+
+                        outchannel.println(out);
+                        s.close();
                     }
+
 
                 }
 
@@ -237,85 +251,14 @@ public class Server {
     }
 
 
-    /*
-    public static void addList(String query){
-        try {
+    //Inizio implementazione metodi di esecuzione query
 
-            connection = ConnectionDB.getInstance().getConnection();
-
-            ptmt = connection.prepareStatement(query);
-
-            ptmt.executeUpdate(query);
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-
-    public static void removeList(String query){
-        try {
-
-            connection = ConnectionDB.getInstance().getConnection();
-
-            ptmt = connection.prepareStatement(query);
-
-            ptmt.executeUpdate(query);
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-    public static void updateList(String query){
-        try {
-
-            connection = ConnectionDB.getInstance().getConnection();
-
-            ptmt = connection.prepareStatement(query);
-
-            ptmt.executeUpdate(query);
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-
-
-
-    public static void addEvent(String query) {
-
-        try {
-
-            connection = ConnectionDB.getInstance().getConnection();
-
-            ptmt = connection.prepareStatement(query);
-
-            ptmt.executeUpdate(query);
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-
-
-
-    }
-
-
-    */
-
+    /**
+     * Questo metodo si occupa di eseguire la query di selezione delle informazioni dei dipendenti
+     *
+     * @param query
+     * @return String out che contiene il risultato della query
+     */
     public static String details(String query){
 
         String out="Error\n";
@@ -355,6 +298,13 @@ public class Server {
 
     }
 
+
+    /**
+     * Questo metodo si occupa di eseguire la query di selezione delle informazioni utili alla creazione del report
+     *
+     * @param query
+     * @return String out che contiene il risultato della query
+     */
     public static String createReport(String query){
 
         String out="Error!\n";
@@ -387,14 +337,18 @@ public class Server {
     }
 
 
-
+    /**
+     * Questo metodo si occupa di eseguire la query di selezione dei dipendenti
+     *
+     * @param query
+     * @return String out che contiene il risultato della query
+     */
 
 
     public static String searchList(String query) {
 
         String out="Error!\n";
         try {
-
 
 
             connection = ConnectionDB.getInstance().getConnection();
@@ -424,6 +378,12 @@ public class Server {
         return out;
     }
 
+    /**
+     * Questo metodo si occupa di eseguire la query di selezione dei dipendenti
+     *
+     * @param query
+     * @return String out che contiene il risultato della query
+     */
 
     public static String selectAllList(String query){
 
@@ -468,6 +428,12 @@ public class Server {
     }
 
 
+    /**
+     * Questo metodo si occupa di eseguire la query per il conteggio del numero di eventi giornalieri
+     *
+     * @param query
+     * @return String out che contiene il risultato della query
+     */
     public static String countItem(String query) {
 
 
@@ -495,6 +461,13 @@ public class Server {
         return out;
     }
 
+
+    /**
+     * Questo metodo si occupa di eseguire la query di selezione dei dipendenti
+     *
+     * @param query
+     * @return String out che contiene il risultato della query
+     */
     public static String retId(String query){
 
         String out = "Error!\n";
@@ -521,6 +494,12 @@ public class Server {
     }
 
 
+    /**
+     * Questo metodo si occupa di eseguire la query di ordinamento cronologico degli eventi
+     *
+     * @param query
+     * @return String out che contiene il risultato della query
+     */
     public static String orderByDate(String query){
 
         String out="Error!\n";
@@ -559,6 +538,12 @@ public class Server {
     }
 
 
+    /**
+     * Questo metodo si occupa di eseguire la query di ricerca per intervallo di data
+     *
+     * @param query
+     * @return String out che contiene il risultato della query
+     */
     public static String searchDate(String query){
 
         String out="Error!\n";
@@ -582,7 +567,6 @@ public class Server {
 
                 out += res.getString("ID_Event")+ "\n";
 
-                //out += res.getString("Hour")+ "\n";
 
 
             }
@@ -597,6 +581,13 @@ public class Server {
     }
 
 
+    /**
+     * Questo metodo si occupa di eseguire le query di aggiunta e rimozione dei dipendenti dal db
+     *
+     * @param query
+     * @return
+     * String out che contiene il risultato della query
+     */
     public static String standardQueryExecutor(String query){
 
         String out = "Error!\n";
@@ -607,7 +598,7 @@ public class Server {
             ptmt = connection.prepareStatement(query);
 
             ptmt.executeUpdate(query);
-            //ptmt.executeQuery(query);
+
             out = "OK\n";
 
 

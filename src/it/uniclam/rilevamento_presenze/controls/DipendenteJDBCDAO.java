@@ -1,10 +1,7 @@
 package it.uniclam.rilevamento_presenze.controls;
 
-import it.uniclam.rilevamento_presenze.connections.ConnectionDB;
-
-//import it.uniclam.rilevamento_presenze.test.test.User;
+import it.uniclam.rilevamento_presenze.beanclass.Employee;
 import it.uniclam.rilevamento_presenze.connections.Server;
-import it.uniclam.rilevamento_presenze.beanclass.Dipendente;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -15,38 +12,41 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * La Classe DipendenteJDBCDAO:
+ * 1. Svolge il ruolo di client per FXTableUser
+ * 2. Implementa tutti i metodi utilizzati dalla classeFxTableUser
+ * 3.Interagisce con le classi Server e FxTableUser
+ */
 public class DipendenteJDBCDAO {
-	Connection connection = null;
-	PreparedStatement ptmt= null;
-	ResultSet resultSet = null;
-
-	public DipendenteJDBCDAO() {}
-
-	private Connection getConnection() throws SQLException {
-		Connection conn;
-		conn = ConnectionDB.getInstance().getConnection();
-		return conn;
-	}
 
 
+    public DipendenteJDBCDAO() {
+    }
 
 
+    /**
+     * Questo metodo si occupa di effettuare l'aggiunta di un dipendente alla tabella
+     *
+     * @param type_query
+     * @param value
+     */
 
-    public void addList(String type_query,String valueONE){
+    public void addList(String type_query, String value) {
 
-        String req= type_query +"\n" + valueONE + "\n";
+        String req = type_query + "\n" + value + "\n";
 
         try {
             Socket s = new Socket(Server.HOST, Server.PORT);
 
-            PrintWriter out =new PrintWriter(s.getOutputStream(),true);
-            BufferedReader in= new BufferedReader(new InputStreamReader(s.getInputStream()));
+            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             out.println(req);
-            String line=in.readLine();
+            String line = in.readLine();
 
             System.out.println(line);
             s.close();
@@ -58,19 +58,25 @@ public class DipendenteJDBCDAO {
 
     }
 
+    /**
+     * Questo metodo si occupa di effettuare la rimozione di un dipendente alla tabella
+     *
+     * @param type_query
+     * @param valueOne
+     * @param valueTwo
+     */
 
+    public void removeList(String type_query, String valueOne, String valueTwo) {
 
-    public void removeList(String type_query,String valueONE,String valueTWO){
-
-        String req= type_query +"\n" + valueONE + "\n"+ valueTWO + "\n";
+        String req = type_query + "\n" + valueOne + "\n" + valueTwo + "\n";
 
         try {
             Socket s = new Socket(Server.HOST, Server.PORT);
 
-            PrintWriter out =new PrintWriter(s.getOutputStream(),true);
-            BufferedReader in= new BufferedReader(new InputStreamReader(s.getInputStream()));
+            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             out.println(req);
-            String line=in.readLine();
+            String line = in.readLine();
 
             System.out.println(line);
             s.close();
@@ -82,85 +88,95 @@ public class DipendenteJDBCDAO {
     }
 
 
-    public ObservableList<Dipendente> SELECT_List(String type_query){
+    /**
+     * Questo metodo si occupa di riempire la tabella dei dipendenti
+     *
+     * @param type_query
+     * @return ObservableList<Employee> data
+     */
+    public ObservableList<Employee> selectList(String type_query) {
 
 
+        List<Employee> list = new ArrayList<>();
+        String req = type_query + "\n";
 
-        List<Dipendente> list = new ArrayList<>();
-        String req= type_query +"\n";
+        try {
+            Socket s = new Socket(Server.HOST, Server.PORT);
 
-            try {
-                Socket s = new Socket(Server.HOST, Server.PORT);
+            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            out.println(req);
 
-                PrintWriter out = new PrintWriter(s.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-                out.println(req);
+            String name = in.readLine();
+            while (name.length() > 0) {
 
-                String nome = in.readLine();
-                while (nome.length() > 0) {
-
-                    nome = in.readLine();
-                    String cognome = in.readLine();
-                    String id = in.readLine();
-                    if(nome!=null && cognome !=null) {
-                        list.add(new Dipendente(nome, cognome, id));
-                    }
-
-
-                    System.out.println("STAMPA: " + nome + " e: " + cognome);
+                name = in.readLine();
+                String surname = in.readLine();
+                String id = in.readLine();
+                if (name != null && surname != null) {
+                    list.add(new Employee(name, surname, id));
                 }
 
 
-
-                s.close();
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
+                //  System.out.println("STAMPA: " + name + " e: " + surname);
             }
 
-        ObservableList<Dipendente> data = FXCollections.observableList(list);
-        return data;
+
+            s.close();
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
+        ObservableList<Employee> data = FXCollections.observableList(list);
+        return data;
+    }
 
 
-    public void MySQL_GridView(String type_query,String nome, String cognome){
+    /**
+     * Questo metodo si occupa di riempire la tabella degli eventi in ordine cronologico
+     *
+     * @param varName
+     * @param varSurname
+     */
+
+    public void gridView(String type_query, String varName, String varSurname) {
         JFrame frame = new JFrame("Dettagli Eventi");
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        String columnNames[] = { "NOME", "COGNOME", "IN/OUT","DATA","ORA" };
-        String req =  type_query +"\n" + nome+"\n" + cognome+"\n";
+        String columnNames[] = {"NOME", "COGNOME", "IN/OUT", "DATA", "ORA"};
+        String req = type_query + "\n" + varName + "\n" + varSurname + "\n";
 
 
         try {
-            Socket s  = new Socket(Server.HOST, Server.PORT);
+            Socket s = new Socket(Server.HOST, Server.PORT);
 
             PrintWriter out = new PrintWriter(s.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             out.println(req);
 
-            int count=0;
+            int count = 0;
 
-            String Nome=in.readLine();
-            if(Nome.equals("OK")) {
-                Nome=in.readLine();
-                int countrow = Integer.parseInt(Nome);
+            String name = in.readLine();
+            if (name.equals("OK")) {
+                name = in.readLine();
+                int countrow = Integer.parseInt(name);
                 Object rowData[][] = new Object[countrow][];
 
 
-                while (nome.length() > 0 && count < countrow) {
+                while (name.length() > 0 && count < countrow) {
 
-                    Nome = in.readLine();
-                    String Cognome = in.readLine();
-                    String INOUT = in.readLine();
-                    String Data = in.readLine();
-                    String Ora = in.readLine();
+                    name = in.readLine();
+                    String surname = in.readLine();
+                    String inOut = in.readLine();
+                    String date = in.readLine();
+                    String hour = in.readLine();
 
 
-                    rowData[count] = new Object[]{Nome, Cognome, INOUT, Data, Ora};
+                    rowData[count] = new Object[]{name, surname, inOut, date, hour};
 
                     count++;
-                    System.out.println(nome + Cognome + INOUT + Data + Ora);
+                    System.out.println(name + surname + inOut + date + hour);
 
 
                 }
@@ -169,7 +185,7 @@ public class DipendenteJDBCDAO {
                 JTable table = new JTable(rowData, columnNames);
                 JScrollPane scrollPane = new JScrollPane(table);
                 frame.add(scrollPane, BorderLayout.CENTER);
-                frame.pack();//frame.setSize(AUTO)
+                frame.pack();
                 frame.setVisible(true);
 
             }
@@ -179,49 +195,53 @@ public class DipendenteJDBCDAO {
         }
 
 
-
-
-
-
     }
 
-    public void details(String type_query,String nome, String cognome){
+    /**
+     * Questo metodo si occupa di riempire la tabella deelle informazioni dei dipendenti
+     *
+     * @param type_query
+     * @param varName
+     * @param varSurname
+     */
+
+    public void details(String type_query, String varName, String varSurname) {
         JFrame frame = new JFrame("Informazioni dipendenti");
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        String columnNames[] = { "NOME", "COGNOME", "ORARI","PAUSA PRANZO","STRAORDINARIO" };
-        String req =  type_query +"\n" + nome+"\n" + cognome+"\n";
+        String columnNames[] = {"NOME", "COGNOME", "ORARI", "PAUSA PRANZO", "STRAORDINARIO"};
+        String req = type_query + "\n" + varName + "\n" + varSurname + "\n";
 
 
         try {
-            Socket s  = new Socket(Server.HOST, Server.PORT);
+            Socket s = new Socket(Server.HOST, Server.PORT);
 
             PrintWriter out = new PrintWriter(s.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             out.println(req);
 
-            int count=0;
+            int count = 0;
 
-            String Nome=in.readLine();
-            if(Nome.equals("OK")) {
-                Nome = in.readLine();
-                int countrow = Integer.parseInt(Nome);
+            String name = in.readLine();
+            if (name.equals("OK")) {
+                name = in.readLine();
+                int countrow = Integer.parseInt(name);
                 Object rowData[][] = new Object[countrow][];
 
 
-                while (Nome.length() > 0 && count < countrow) {
+                while (name.length() > 0 && count < countrow) {
 
 
-                    Nome = in.readLine();
-                    String Cognome = in.readLine();
-                    String Orari = in.readLine();
-                    String pausa_pranzo = in.readLine();
-                    String straordinario = in.readLine();
+                    name = in.readLine();
+                    String surname = in.readLine();
+                    String workTime = in.readLine();
+                    String breakLunch = in.readLine();
+                    String extra = in.readLine();
 
 
-                    rowData[count] = new Object[]{Nome, Cognome, Orari,pausa_pranzo,straordinario};
+                    rowData[count] = new Object[]{name, surname, workTime, breakLunch, extra};
 
                     count++;
-                   // System.out.println(Nome + Cognome + INOUT + Data + Ora);
+                    // System.out.println(name + surname + INOUT + Data + Ora);
 
 
                 }
@@ -230,7 +250,7 @@ public class DipendenteJDBCDAO {
                 JTable table = new JTable(rowData, columnNames);
                 JScrollPane scrollPane = new JScrollPane(table);
                 frame.add(scrollPane, BorderLayout.CENTER);
-                frame.pack();//frame.setSize(AUTO)
+                frame.pack();
                 frame.setVisible(true);
             }
 
@@ -239,31 +259,32 @@ public class DipendenteJDBCDAO {
         }
 
 
-
-
-
-
     }
 
 
+    /**
+     * Questo metodo si occupa di aggiornare i campi nella tabelle dei dipendenti
+     *
+     * @param type_query
+     * @param name
+     * @param surname
+     * @param id
+     */
+    public void update(String type_query, String name, String surname, String id) {
 
 
-    public void update(String type_query,String nome,String cognome, String id) {
-
-        //String req = "UPDATE user SET Cognome='"+valueTWO+"' WHERE Nome='"+valueONE+"'AND Cognome'"+valueTWO+"'";
-        String req = type_query +"\n" + nome+"\n" + cognome+"\n" + id + "\n";
+        String req = type_query + "\n" + name + "\n" + surname + "\n" + id + "\n";
 
         try {
             Socket s = new Socket(Server.HOST, Server.PORT);
             PrintWriter out = new PrintWriter(s.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            // BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             out.println(req);
 
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
 
     }
@@ -272,26 +293,33 @@ public class DipendenteJDBCDAO {
     //OK
 
 
-    public void searchList(String type_query,String chiavericerca,ObservableList<Dipendente> value){
+    /**
+     * Questo metodo si occupa della ricerca dei dipendenti
+     *
+     * @param type_query
+     * @param keySearch
+     * @param value
+     */
+    public void searchList(String type_query, String keySearch, ObservableList<Employee> value) {
 
-        String req = type_query +"\n" + chiavericerca+"\n";
+        String req = type_query + "\n" + keySearch + "\n";
 
-        ObservableList<Dipendente> data=value;
+        ObservableList<Employee> data = value;
         try {
             Socket s = new Socket(Server.HOST, Server.PORT);
             PrintWriter out = new PrintWriter(s.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             out.println(req);
 
-            String nome = in.readLine();
-            while (nome.length() > 0) {
+            String name = in.readLine();
+            while (name.length() > 0) {
 
-                nome = in.readLine();
-                String cognome = in.readLine();
-                String id =in.readLine();
+                name = in.readLine();
+                String surname = in.readLine();
+                String id = in.readLine();
 
-                if(nome!=null &&cognome !=null && id!=null) {
-                    data.addAll(new Dipendente(nome, cognome, id));
+                if (name != null && surname != null && id != null) {
+                    data.addAll(new Employee(name, surname, id));
                 }
             }
 
@@ -301,120 +329,6 @@ public class DipendenteJDBCDAO {
         }
 
     }
-
-    public int SELECT_NameSurname(String name,String surname,String id_user) {
-
-        int state=0;
-        try {
-            String queryString = "SELECT * FROM user WHERE Cognome='"+surname+"'AND Nome='"+name+"' OR ID_User='"+id_user+"' ";
-            connection = getConnection();
-            //System.out.println("Prepare statemòent OK");
-            Statement st = connection.createStatement();
-            ResultSet res = st.executeQuery(queryString);
-          /* if (res.next()!=false){
-                System.out.println("ACCESSO VALIDO");
-*/
-            while (res.next()==true) {
-                int id=res.getInt("ID_User");
-                String nome = res.getString("Nome");
-                String cognome = res.getString("Cognome");
-                //String telefono=res.getString("Telefono");
-
-                //  System.out.println(id + "\t" + nome + "\t" + cognome+ "\t" + telefono);
-                state=id;}
-            //if(res.next()==false) { System.out.println("ACCESSO NEGATO:Badge non valido");}
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-
-                if (resultSet != null)
-                    resultSet.close();
-                if (ptmt != null)
-                    ptmt.close();
-                if (connection != null)
-                    connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
-        return state;
-    }
-
-    public String genPDF(String type_query){
-
-        String req = type_query +"\n";
-
-
-        try {
-            Socket s = new Socket(Server.HOST, Server.PORT);
-
-            PrintWriter out =new PrintWriter(s.getOutputStream(),true);
-            BufferedReader in= new BufferedReader(new InputStreamReader(s.getInputStream()));
-            out.println(req);
-            String line=in.readLine();
-
-            System.out.println(line);
-            s.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-return req;
-
-    }
-
-
-    public String SELECT_PDF() {
-
-        int state=0;
-        String stringa="";
-        try {
-            String queryString = "SELECT * FROM user  ";
-            connection = getConnection();
-            System.out.println("CO");
-            Statement st = connection.createStatement();
-            ResultSet res = st.executeQuery(queryString);
-          /* if (res.next()!=false){
-                System.out.println("ACCESSO VALIDO");
-*/
-            while (res.next()==true) {
-                int id=res.getInt("ID_User");
-                String nome = res.getString("Nome");
-                String cognome = res.getString("Cognome");
-
-stringa=id + "\t" + nome + "\t" + cognome;
-                System.out.println(id + "\t" + nome + "\t" + cognome);
-                state=id;}
-            //if(res.next()==false) { System.out.println("ACCESSO NEGATO:Badge non valido");}
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-
-                if (resultSet != null)
-                    resultSet.close();
-                if (ptmt != null)
-                    ptmt.close();
-                if (connection != null)
-                    connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
-        return stringa;
-
-
-}
-
 
 
 }

@@ -5,15 +5,34 @@ import javafx.beans.property.SimpleStringProperty;
 /**
  * Created by Chriz 7X on 06/12/2015.
  */
+
+/**
+ * La classe Event:
+ * 1. identifica l'oggetto "evento"
+ * 2. Interagisce con la GUI FxTableEvent
+ */
+
 public class Event {
-    private SimpleStringProperty nome;//NOme=HOUR
-    private SimpleStringProperty data;//COgnome=Data
+
+    //Tipo di stringa utilizzato dalla tabella FxTableEvent
+    private SimpleStringProperty nome;
+    private SimpleStringProperty data;
     private SimpleStringProperty cognome;
     private SimpleStringProperty type_id;
     private SimpleStringProperty event_id;
 
     public Event() {
     }
+
+    /**
+     * Costruttore personalizzato della classe evento
+     *
+     * @param s1
+     * @param s2
+     * @param s3
+     * @param s4
+     * @param s5
+     */
 
     public Event(String s1, String s2,String s3,String s4,String s5) {
 
@@ -73,6 +92,6 @@ public class Event {
     @Override
     public String toString() {
 
-        return ("IL DIPENDENTE: "+ cognome.get()+" "+ nome.get() + "IN DATA" +data.get()+"HA EFFETTUATO UN "+type_id.get());
+        return ("IL DIPENDENTE: " + cognome.get() + " " + nome.get() + "IN DATA" + data.get() + "HA EFFETTUATO UN' " + type_id.get());
     }
 }
