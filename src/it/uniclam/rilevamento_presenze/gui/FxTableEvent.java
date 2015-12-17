@@ -134,7 +134,6 @@ public class FxTableEvent extends Application {
                 //Aggiorno il valore nel database INIZIO:
                 int ix = table.getSelectionModel().getFocusedIndex();
 
-               // Event event = (Event) table.getSelectionModel().getSelectedItem();
 
 
                 String id_event = table.getItems().get(ix).getEvent_id().toString();
@@ -173,19 +172,18 @@ public class FxTableEvent extends Application {
                 //Aggiorno il valore nel database INIZIO:
                 int ix = table.getSelectionModel().getSelectedIndex();
                 Event dipendente = table.getSelectionModel().getSelectedItem();
-                System.out.println(ix);
 
 
                 String nome = table.getItems().get(ix).getNome().toString();
                 String cognome = table.getItems().get(ix).getData().toString();
                 String user_id = table.getItems().get(ix).getCognome().toString();
                 String type_id = table.getItems().get(ix).getType_id().toString();
-                // System.out.println(autore+"tralalal");
+
                 //update
-                //QUERYlj.updateList(Server.QUERY_UPDATE_LIST, nome, cognome);
+
                 //Aggiorno il valore nel database FINE:
 
-                System.out.println("Ho modificato il valore di autori");
+
             }
         });
 

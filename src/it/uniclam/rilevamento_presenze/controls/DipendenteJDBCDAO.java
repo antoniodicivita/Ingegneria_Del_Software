@@ -46,9 +46,9 @@ public class DipendenteJDBCDAO {
             PrintWriter out = new PrintWriter(s.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             out.println(req);
-            String line = in.readLine();
+            //String line = in.readLine();
 
-            System.out.println(line);
+            // System.out.println(line);
             s.close();
 
         } catch (IOException e) {
@@ -76,9 +76,9 @@ public class DipendenteJDBCDAO {
             PrintWriter out = new PrintWriter(s.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             out.println(req);
-            String line = in.readLine();
 
-            System.out.println(line);
+
+            //  System.out.println(line);
             s.close();
 
         } catch (IOException e) {
@@ -113,7 +113,7 @@ public class DipendenteJDBCDAO {
                 name = in.readLine();
                 String surname = in.readLine();
                 String id = in.readLine();
-                if (name != null && surname != null) {
+                if (name != null && surname != null && id != null) {
                     list.add(new Employee(name, surname, id));
                 }
 
@@ -176,7 +176,7 @@ public class DipendenteJDBCDAO {
                     rowData[count] = new Object[]{name, surname, inOut, date, hour};
 
                     count++;
-                    System.out.println(name + surname + inOut + date + hour);
+                    //System.out.println(name + surname + inOut + date + hour);
 
 
                 }
@@ -241,7 +241,6 @@ public class DipendenteJDBCDAO {
                     rowData[count] = new Object[]{name, surname, workTime, breakLunch, extra};
 
                     count++;
-                    // System.out.println(name + surname + INOUT + Data + Ora);
 
 
                 }

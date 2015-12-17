@@ -58,9 +58,15 @@ public class GeneratePDF {
             GregorianCalendar gcalendar = new GregorianCalendar();
             int month = gcalendar.get(Calendar.MONTH) + 1;
             int year = gcalendar.get(Calendar.YEAR);
+            int day = gcalendar.get(Calendar.DAY_OF_MONTH);
+            if (day == 31 && month == 12) {
+                createYearReport(Server.QUERY_CREATE_YEAR_REPORT, year, table);
+                document.add(table);
+            } else {
 
-            createReport(Server.QUERY_CREATE_MONTH_REPORT, month, year, table);
+                createMonthReport(Server.QUERY_CREATE_MONTH_REPORT, month, year, table);
             document.add(table);
+            }
 
             JOptionPane.showMessageDialog(null, "Report Salvato Con Successo!");
 			document.close();
@@ -82,7 +88,7 @@ public class GeneratePDF {
      * @param year
      * @param table
      */
-    public static void createReport(String type_query, int month, int year, PdfPTable table) {
+    public static void createMonthReport(String type_query, int month, int year, PdfPTable table) {
 
 
         String req = type_query + "\n" + month + "\n" + year + "\n";
@@ -114,6 +120,42 @@ public class GeneratePDF {
             e.printStackTrace();
         }
 
+
+
+    }
+
+
+    public static void createYearReport(String type_query, int year, PdfPTable table) {
+
+
+        String req = type_query + "\n" + year + "\n";
+        try {
+            Socket s = new Socket(Server.HOST, Server.PORT);
+            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            out.println(req);
+            String name = in.readLine();
+
+            if (name.equals("OK")) {
+                while (name.length() > 0) {
+
+                    name = in.readLine();
+                    String surname = in.readLine();
+                    String inOut = in.readLine();
+                    String date = in.readLine();
+                    String hour = in.readLine();
+
+
+                    table.addCell(name);
+                    table.addCell(surname);
+                    table.addCell(inOut);
+                    table.addCell(date);
+                    table.addCell(hour);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
     }

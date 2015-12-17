@@ -103,7 +103,7 @@ public class FxTableUser
                 //Modifica dei campi quando faccio invio (COLONNA 1)
                 int ix = table.getSelectionModel().getSelectedIndex();
                 Employee employee = table.getSelectionModel().getSelectedItem();
-                System.out.println(ix);
+
                 String nome = table.getItems().get(ix).getName().toString();
                 String cognome = table.getItems().get(ix).getSurname().toString();
                 String id_employee=table.getItems().get(ix).getId_employee().toString();
@@ -128,7 +128,6 @@ public class FxTableUser
                 //Aggiorno il valore nel database INIZIO:
                 int ix = table.getSelectionModel().getSelectedIndex();
                 Employee employee = table.getSelectionModel().getSelectedItem();
-                System.out.println(ix);
 
 
                 String nome = table.getItems().get(ix).getName().toString();
@@ -158,7 +157,7 @@ public class FxTableUser
                 //Modifica dei campi quando faccio invio (COLONNA 1)
                 int ix = table.getSelectionModel().getSelectedIndex();
                 Employee employee = table.getSelectionModel().getSelectedItem();
-                System.out.println(ix);
+
                 String nome = table.getItems().get(ix).getName().toString();
                 String cognome = table.getItems().get(ix).getSurname().toString();
                 String id_employee=table.getItems().get(ix).getId_employee().toString();
@@ -281,7 +280,7 @@ public class FxTableUser
 		@Override
 		public void handle(ActionEvent e) {
 
-            System.out.println(data.size());
+
             buttonHb.setVisible(false);
             buttonHbTWO.setVisible(true);
             TextboxSearch.setVisible(false);
@@ -295,17 +294,17 @@ public class FxTableUser
         @Override
         public void handle(ActionEvent e) {
 
-            DipendenteJDBCDAO lj = new DipendenteJDBCDAO();
+
             Employee employee = employee = new Employee("", TextboxInsertPK.getText(), "");
             data.add(employee);
 
             int row = data.size() - 1;
-            System.out.println(data.size());
+
             // Select the new row
             table.requestFocus();
             table.getSelectionModel().select(row);
             table.getFocusModel().focus(row);
-            lj.addList(Server.QUERY_ADD_LIST,TextboxInsertPK.getText());
+            employeeObject.addList(Server.QUERY_ADD_LIST, TextboxInsertPK.getText());
 
 
             buttonHbTWO.setVisible(false);
@@ -326,7 +325,6 @@ public class FxTableUser
 			// Get selected row and delete
 			int ix = table.getSelectionModel().getSelectedIndex();
             Employee employee = table.getSelectionModel().getSelectedItem();
-            System.out.println(table.getItems().get(ix).toString());
 
 
             String name = table.getItems().get(ix).getName().toString();
@@ -386,7 +384,7 @@ public class FxTableUser
 //
             int ix = table.getSelectionModel().getSelectedIndex();
             Employee employee = table.getSelectionModel().getSelectedItem();
-            System.out.println(table.getItems().get(ix).toString());
+
 
             String name = table.getItems().get(ix).getName().toString();
             String surname = table.getItems().get(ix).getSurname().toString();
@@ -448,7 +446,6 @@ public class FxTableUser
 
             int ix = table.getSelectionModel().getSelectedIndex();
             Employee employee = table.getSelectionModel().getSelectedItem();
-            System.out.println(table.getItems().get(ix).toString());
 
 
             String name = table.getItems().get(ix).getName().toString();

@@ -25,6 +25,8 @@ import java.io.IOException;
 public class BadgeGUI extends JFrame implements ActionListener {
 
     public static int MAX_BADGE_NUM = 2;
+    public static int ENTRATA = 1;
+    public static int USCITA = 2;
     int Return_ID_User;
 
 
@@ -162,7 +164,7 @@ public class BadgeGUI extends JFrame implements ActionListener {
 
         if (e.getSource()==ButtonBADGE_IN){
 
-            type_event=1;
+            type_event = ENTRATA;
 
 
 
@@ -178,8 +180,8 @@ public class BadgeGUI extends JFrame implements ActionListener {
 
                     } else {
                         JOptionPane.showMessageDialog(this,
-                                "Dipendente NON inserito",
-                                "Numero di INGRESSI superato",
+                                "Numero di Ingressi o Uscite superato",
+                                "Errore",
                                 JOptionPane.WARNING_MESSAGE);
                     }
                     //TextBoxNome.setText(" ");
@@ -196,7 +198,7 @@ public class BadgeGUI extends JFrame implements ActionListener {
 
         else if (e.getSource()==ButtonBADGE_OUT){
 
-            type_event = 2;
+            type_event = USCITA;
 
 
             if (Return_ID_User!=0) {
@@ -211,8 +213,8 @@ public class BadgeGUI extends JFrame implements ActionListener {
                 } else {
 
                     JOptionPane.showMessageDialog(this,
-                            "Dipendente NON inserito",
-                            "Numero di INGRESSI/USCITE superato",
+                            "Numero di Ingressi o Uscite superato",
+                            "Errore",
                             JOptionPane.WARNING_MESSAGE);}
                 //TextBoxNome.setText(" ");
                 //TextBoxCognome.setText(" ");
